@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>How to Build an AI Customer Support Agent | MASS</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S0TWT8QTLL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-S0TWT8QTLL');
+    </script>
+    <meta name="description"
+        content="See the architecture, retrieval, guardrails, evaluation, and escalation design behind an AI support agent handling 80% of routine queries.">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="MASS">
+    <link rel="canonical" href="https://mass.llc/ai-support-agent-80-percent">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="How We Built an AI Support Agent for 80% of Queries">
+    <meta property="og:description"
+        content="Architecture, retrieval, guardrails, and escalation lessons from a production-style support agent.">
+    <meta property="og:url" content="https://mass.llc/ai-support-agent-80-percent">
+    <meta property="article:published_time" content="2026-01-15">
+    <meta property="article:section" content="AI Agents">
+    <meta name="twitter:card" content="summary">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <script
+        type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"How We Built an AI Support Agent That Handles 80% of Queries Without Human Help","description":"Architecture and design decisions behind a high-containment AI customer support agent.","datePublished":"2026-01-15","dateModified":"2026-07-28","author":{"@type":"Organization","name":"MASS"},"publisher":{"@type":"Organization","name":"MASS"},"mainEntityOfPage":"https://mass.llc/ai-support-agent-80-percent","@id":"https://mass.llc/ai-support-agent-80-percent","url":"https://mass.llc/ai-support-agent-80-percent"}</script>
+    <script src="assets/vendor/three.min.js" defer></script>
+    <script src="js/script.js?v=20260904-url" defer></script>
+</head>
+
+<body class="article-page"><a class="skip" href="#main">Skip to content</a>
+    <header class="site-header dark"><a class="logo" href="/">MASS</a><button class="menu"
+            aria-label="Open navigation" aria-expanded="false">☰</button>
+        <nav class="nav" aria-label="Primary"><a href="/">Home</a><a href="/website">Website</a><a
+                href="/agentic-ai">Agentic AI</a></nav><a class="nav-cta" href="/contact">Start a project
+            <span>↗</span></a>
+    </header>
+    <main id="main">
+        <article>
+            <header class="article-hero">
+                <div class="article-meta"><span>AI Agents · 10 min read</span><time datetime="2026-01-15">January
+                        2026</time></div>
+                <h1>How We Built an AI Support Agent That Handles <span class="serif">80% of Queries</span> Without
+                    Human Help</h1>
+                <p class="article-deck">A behind-the-scenes look at the architecture, knowledge design, guardrails, and
+                    escalation rules that made high containment useful—not reckless.</p>
+            </header>
+            <div class="article-layout">
+                <aside class="article-toc"><strong>In this guide</strong><a href="#goal">The real goal</a><a
+                        href="#architecture">Architecture</a><a href="#knowledge">Knowledge design</a><a
+                        href="#guardrails">Guardrails</a><a href="#evaluation">Evaluation</a><a href="#faq">FAQ</a>
+                </aside>
+                <div class="article-body">
+                    <p class="quick-answer">The agent reached 80% routine-query containment by doing less, not more: a
+                        tightly defined support scope, retrieval from approved content, deterministic account tools,
+                        confidence-based escalation, and continuous review of failed conversations.</p>
+                    <h2 id="goal">We optimized for correct resolution, not deflection</h2>
+                    <p>“Ticket deflection” is a dangerous north-star metric. A system can reduce tickets by frustrating
+                        customers, inventing answers, or hiding the path to a person. We defined success as a resolved
+                        routine request with supporting evidence and no human action required.</p>
+                    <p>The remaining 20% was not a failure bucket. It contained ambiguous requests, sensitive account
+                        actions, policy exceptions, complaints, and cases where the available evidence was insufficient.
+                    </p>
+                    <h2 id="architecture">The support agent architecture</h2>
+                    <table class="article-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Responsibility</th>
+                                <th>Failure behavior</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Intent router</td>
+                                <td>Identify request type and required systems</td>
+                                <td>Ask one clarifying question or escalate</td>
+                            </tr>
+                            <tr>
+                                <td>Knowledge retrieval</td>
+                                <td>Find relevant approved support content</td>
+                                <td>Do not answer without sufficient evidence</td>
+                            </tr>
+                            <tr>
+                                <td>Account tools</td>
+                                <td>Read order, subscription, or ticket state</td>
+                                <td>Return structured error; never guess</td>
+                            </tr>
+                            <tr>
+                                <td>Policy layer</td>
+                                <td>Check action limits and approval rules</td>
+                                <td>Block or request human approval</td>
+                            </tr>
+                            <tr>
+                                <td>Response composer</td>
+                                <td>Explain the answer and next step clearly</td>
+                                <td>Use a safe escalation response</td>
+                            </tr>
+                            <tr>
+                                <td>Trace and evaluation</td>
+                                <td>Record evidence, tool calls, and outcomes</td>
+                                <td>Queue failures for review</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h2 id="knowledge">The knowledge base mattered more than the prompt</h2>
+                    <p>We broke long help documents into task-centered passages, preserved titles and update dates, and
+                        attached metadata for product, region, plan, and policy status. Retrieval returned a small
+                        evidence set; the model had to cite that evidence internally before composing the customer
+                        response.</p>
+                    <h3>Knowledge rules that improved reliability</h3>
+                    <ul>
+                        <li>One authoritative owner for each policy.</li>
+                        <li>Expiration or review dates on high-change content.</li>
+                        <li>Separate “how-to” instructions from contractual policy.</li>
+                        <li>Version-aware retrieval so old plans do not leak into current answers.</li>
+                        <li>A visible “no evidence” path that escalates rather than improvises.</li>
+                    </ul>
+                    <h2 id="guardrails">Actions were tiered by risk</h2>
+                    <p>Read-only account lookup was low risk. Drafting a response was moderate. Changing a subscription,
+                        issuing value, or deleting data was high risk. Every tool declared its required permissions,
+                        reversibility, and confirmation policy.</p>
+                    <div class="article-callout"><strong>Escalation triggers</strong>
+                        <p>Low retrieval confidence, conflicting sources, repeated tool failure, negative sentiment plus
+                            account impact, sensitive personal information, policy exception, or any action above the
+                            agent’s authority.</p>
+                    </div>
+                    <p>OpenAI’s agent guidance recommends human intervention after failure thresholds and before
+                        high-risk actions. That principle became part of the workflow, not a disclaimer at the bottom of
+                        the interface.</p>
+                    <h2 id="evaluation">How we evaluated the agent</h2>
+                    <p>Before release, we assembled a test set of common questions, awkward phrasing, missing details,
+                        conflicting information, adversarial instructions, and known edge cases. Each run was scored on
+                        outcome, evidence, tool correctness, tone, and escalation behavior.</p>
+                    <ul>
+                        <li><strong>Containment rate:</strong> routine requests resolved without human work.</li>
+                        <li><strong>Correct resolution rate:</strong> resolved requests that were actually correct.</li>
+                        <li><strong>False containment:</strong> cases the agent claimed to resolve but should have
+                            escalated.</li>
+                        <li><strong>Escalation quality:</strong> whether the human received a useful summary and
+                            evidence.</li>
+                        <li><strong>Repeat contact:</strong> customers returning for the same unresolved issue.</li>
+                    </ul>
+                    <p>The 80% figure refers to the defined routine-query set, not every possible support contact. Scope
+                        discipline is why the number is credible.</p>
+                    <h2>What we would build next</h2>
+                    <p>We would prioritize better policy change detection, automated regression tests whenever source
+                        content changes, multilingual evaluation sets, and clearer analytics that separate customer
+                        behavior from agent performance.</p>
+                    <h2 id="faq">Frequently asked questions</h2>
+                    <div class="article-faq">
+                        <details>
+                            <summary>What percentage of support tickets can AI automate?</summary>
+                            <p>There is no universal percentage. It depends on query mix, knowledge quality, system
+                                access, policy complexity, and acceptable risk. Measure containment for clearly defined
+                                intent groups rather than advertising one number across every channel.</p>
+                        </details>
+                        <details>
+                            <summary>Should an AI support agent have access to customer accounts?</summary>
+                            <p>Only when required, with minimum permissions, structured tools, authentication, logging,
+                                and approval for sensitive actions. Start read-only and expand based on evidence.</p>
+                        </details>
+                        <details>
+                            <summary>How do you stop an AI support agent from hallucinating?</summary>
+                            <p>You cannot promise zero errors. Reduce them with grounded retrieval, output validation,
+                                narrow scope, deterministic tools, refusal when evidence is missing, evaluation, and
+                                human escalation.</p>
+                        </details>
+                    </div>
+                    <div class="article-sources"><strong>Sources:</strong> <a
+                            href="https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/"
+                            target="_blank" rel="noopener">OpenAI agent design guide</a>; <a
+                            href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank"
+                            rel="noopener">NIST AI RMF</a>.</div>
+                </div>
+            </div>
+        </article>
+        <section class="article-cta">
+            <h2>Build support automation customers can <span class="serif">actually trust.</span></h2><a class="btn"
+                href="/contact">Design a support agent <span>↗</span></a>
+        </section>
+    </main>
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__top">
+                <a href="/" class="footer__logo">MASS</a>
+                <a href="mailto:contact@mass.llc" class="btn footer__email-btn">contact@mass.llc</a>
+            </div>
+            <div class="footer__grid">
+                <div>
+                    <p class="footer__col-header">Pages</p>
+                    <ul class="footer__col-list">
+                        <li><a href="/">Home <span>→</span></a></li>
+                        <li><a href="/about">About <span>→</span></a></li>
+                        <li><a href="/contact">Contact <span>→</span></a></li>
+                        <li><a href="/blog">Blogs <span>→</span></a></li>
+                        <li><a href="/terms">Terms <span>→</span></a></li>
+                        <li><a href="/privacy">Privacy <span>→</span></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer__col-header">Services</p>
+                    <ul class="footer__col-list">
+                        <li><a href="/website">Website <span>→</span></a></li>
+                        <li><a href="/agentic-ai">Agentic AI <span>→</span></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer__col-header">Social</p>
+<ul class="footer__col-list footer__social-list" aria-label="Social profiles">
+                        <li><a class="footer-social-button" href="https://www.instagram.com/ma_software_solutions/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a></li>
+                        <li><a class="footer-social-button" href="https://www.linkedin.com/company/mass-growth-partner/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9v9M6 6.5v.01M10 18v-5.2c0-2 1.2-3.2 2.9-3.2s3.1 1.2 3.1 3.5V18M10 12v6"/></svg></a></li>
+                        <li><a class="footer-social-button" href="https://www.reddit.com/user/Ratan_Anmol1094/" target="_blank" rel="noopener noreferrer" aria-label="Reddit"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8.5 15c2 1.5 5 1.5 7 0M13 6l1-3 3 1M6 10 4 9M18 10l2-1"/></svg></a></li>
+                        <li><a class="footer-social-button" href="https://x.com/anmol_rata92354" target="_blank" rel="noopener noreferrer" aria-label="X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l14 16M19 4L5 20"/></svg></a></li>
+                        <li><a class="footer-social-button" href="https://www.threads.com/@ma_software_solutions" target="_blank" rel="noopener noreferrer" aria-label="Threads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 8.5c-1-3-3.1-4.5-5.7-4.5C7.7 4 5 7.1 5 12s2.7 8 7 8c4.1 0 6.7-2.3 6.7-5.4 0-2.7-2-4.5-5-4.5-2.8 0-4.7 1.4-4.7 3.5 0 1.7 1.3 2.8 3.1 2.8 2.6 0 4.2-2.2 4.2-5.2 0-2.6-1.1-4.1-2.9-4.1-1.4 0-2.5.7-3 1.7"/></svg></a></li>
+                        <li><button class="footer-social-button" type="button" aria-label="Facebook — link coming soon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 21v-8h3l.5-3H14V8.4c0-.9.3-1.5 1.6-1.5H18V4.2c-.4-.1-1.3-.2-2.4-.2-2.4 0-4.1 1.5-4.1 4.2V10H9v3h2.5v8"/></svg></button></li>
+                        <li><button class="footer-social-button" type="button" aria-label="GitHub — link coming soon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 19c-4 1-4-2-6-2m12 4v-3a3 3 0 0 0-.8-2.4c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.2s-1-.3-3.3 1.3a11.4 11.4 0 0 0-6 0C5.8 3 4.8 3.3 4.8 3.3a4.4 4.4 0 0 0-.1 3.2 4.7 4.7 0 0 0-1.3 3.2c0 4.7 2.8 5.7 5.5 6A3 3 0 0 0 8 18v3"/></svg></button></li>
+                        <li><button class="footer-social-button" type="button" aria-label="YouTube — link coming soon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12c0 4-1 6-3 6H6c-2 0-3-2-3-6s1-6 3-6h12c2 0 3 2 3 6z"/><path d="m10 9 5 3-5 3z"/></svg></button></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer__col-header">Contact</p>
+                    <div class="footer__col-list footer__contact">
+                        <p>Launders St, Herndon, VA 20171<br>United States</p>
+                        <p><a href="mailto:contact@mass.llc">contact@mass.llc</a></p>
+                        <p><a href="tel:+15404887038">+1 540 488 7038</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <p>© 2022 MASS LLC · All rights reserved.</p>
+                <p>Designed &amp; built by MASS</p>
+            </div>
+            <div class="footer__watermark" aria-hidden="true">MA Software Solutions</div>
+            <div id="footer-wave" class="footer__wave-canvas" aria-hidden="true"></div>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "MASS — Web Development & Agentic AI",
+  "short_name": "MASS",
+  "description": "MASS builds high-performance websites and practical agentic AI systems for ambitious organizations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090909",
+  "theme_color": "#090909",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
