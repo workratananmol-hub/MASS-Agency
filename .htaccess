@@ -1,0 +1,46 @@
+Options -MultiViews
+DirectoryIndex index.html
+
+RewriteEngine On
+
+# Branded error documents. Apache keeps the original 4xx/5xx status.
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# Do not apply public-URL rewrites to an error subrequest, and do not
+# 301 the error files to extensionless URLs (that would risk a 200).
+RewriteCond %{ENV:REDIRECT_STATUS} ^[45][0-9][0-9]$
+RewriteRule ^ - [L]
+RewriteRule ^(404|500)\.html$ - [L]
+
+# Use the secure, canonical domain.
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} !^mass\.llc$ [NC]
+RewriteRule ^ https://mass.llc%{REQUEST_URI} [R=301,L]
+
+# Redirect direct .html requests to the public extensionless URL.
+# The explicit index rule keeps the homepage at the root URL.
+RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+RewriteRule ^index\.html$ / [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/+(.+?)\.html[\s?] [NC]
+RewriteRule ^(.+)\.html$ /$1 [R=301,L,NE]
+
+# Resolve extensionless public URLs to the corresponding HTML file.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+?)/?$ $1.html [L]
+
+# Basic response hardening that does not interfere with public crawling.
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Compress text-based assets when mod_deflate is available.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
