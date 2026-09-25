@@ -1,7 +1,8 @@
 /* Canonical-domain metadata */
 (()=>{
   const canonicalDomain="https://mass.llc";
-  const cleanPath=(location.pathname==="/"||/\/index\.html$/i.test(location.pathname))?"/":location.pathname.replace(/\.html$/i,"");
+  const normalizedPath=location.pathname.replace(/\/+$/,"")||"/";
+  const cleanPath=(normalizedPath==="/"||/\/index(?:\.html)?$/i.test(normalizedPath))?"/":normalizedPath.replace(/\.html$/i,"");
   const canonicalUrl=canonicalDomain+cleanPath;
   const canonical=document.querySelector('link[rel="canonical"]');
   if(canonical)canonical.href=canonicalUrl;
@@ -302,8 +303,32 @@
   }));
 })();
 
+/* GA4 conversion and contact-intent tracking (no personal data). */
+const trackMassEvent=(name,params={})=>{
+  if(typeof window.gtag==="function")window.gtag("event",name,params);
+};
+document.addEventListener("click",event=>{
+  const link=event.target.closest("a");
+  if(!link)return;
+  const href=link.getAttribute("href")||"";
+  if(href.startsWith("mailto:")){
+    trackMassEvent("email_click",{link_location:location.pathname});
+    return;
+  }
+  if(href.startsWith("tel:")){
+    trackMassEvent("phone_click",{link_location:location.pathname});
+    return;
+  }
+  try{
+    const url=new URL(link.href,location.href);
+    if(url.origin===location.origin&&url.pathname.replace(/\/$/,"")==="/contact"){
+      trackMassEvent("contact_cta_click",{link_location:location.pathname});
+    }
+  }catch{}
+});
+
 const form=document.querySelector("#contact-form");
-form?.addEventListener("submit",e=>{e.preventDefault();let ok=true;const fields=[...form.querySelectorAll("[required]")];fields.forEach(f=>{const err=f.parentElement.querySelector(".error");let msg="";if(!f.value.trim())msg="This field is required.";else if(f.type==="email"&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value))msg="Enter a valid email address.";f.setAttribute("aria-invalid",msg?"true":"false");if(err)err.textContent=msg;ok=!msg&&ok});if(ok){const name=form.name.value.trim(),email=form.email.value.trim(),company=form.company.value.trim(),message=form.message.value.trim(),budget=form.budget.value.trim();const body=["Name: "+name,"Email: "+email,company?"Company: "+company:null,budget?"Budget range: "+budget:null,"",message].filter(line=>line!==null).join("\n");const mailto="mailto:contact@mass.llc?subject="+encodeURIComponent("Project brief from "+name)+"&body="+encodeURIComponent(body);form.reset();form.hidden=true;const success=document.querySelector(".success");success.classList.add("show");success.focus();window.location.href=mailto}});
+form?.addEventListener("submit",e=>{e.preventDefault();let ok=true;const fields=[...form.querySelectorAll("[required]")];fields.forEach(f=>{const err=f.parentElement.querySelector(".error");let msg="";if(!f.value.trim())msg="This field is required.";else if(f.type==="email"&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value))msg="Enter a valid email address.";f.setAttribute("aria-invalid",msg?"true":"false");if(err)err.textContent=msg;ok=!msg&&ok});if(ok){trackMassEvent("generate_lead",{method:"email_brief"});const name=form.name.value.trim(),email=form.email.value.trim(),company=form.company.value.trim(),message=form.message.value.trim(),budget=form.budget.value.trim();const body=["Name: "+name,"Email: "+email,company?"Company: "+company:null,budget?"Budget range: "+budget:null,"",message].filter(line=>line!==null).join("\n");const mailto="mailto:contact@mass.llc?subject="+encodeURIComponent("Project brief from "+name)+"&body="+encodeURIComponent(body);form.reset();form.hidden=true;const success=document.querySelector(".success");success.classList.add("show");success.focus();window.location.href=mailto}});
 if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&navigator.hardwareConcurrency>4){document.addEventListener("pointermove",e=>{document.documentElement.style.setProperty("--mx",e.clientX+"px");document.documentElement.style.setProperty("--my",e.clientY+"px")},{passive:true})}
 (()=>{
   const fine=matchMedia("(hover: hover) and (pointer: fine)").matches,reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
