@@ -18,6 +18,14 @@ RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} !^mass\.llc$ [NC]
 RewriteRule ^ https://mass.llc%{REQUEST_URI} [R=301,L]
 
+# Preserve SEO equity for renamed and retired public routes.
+RewriteRule ^website(?:\.html)?/?$ /web-development [R=301,L,NC]
+RewriteRule ^service-web-mobile(?:\.html)?/?$ /web-development [R=301,L,NC]
+RewriteRule ^services(?:\.html)?/?$ / [R=301,L,NC]
+RewriteRule ^insight-roi-ai-automation(?:\.html)?/?$ /ai-automation-roi [R=301,L,NC]
+RewriteRule ^blog-posts/ai-document-processing-automation(?:\.html)?/?$ /ai-automation [R=301,L,NC]
+RewriteRule ^blog-posts/react-vs-nextjs-saas(?:\.html)?/?$ /software-development [R=301,L,NC]
+
 # Redirect direct .html requests to the public extensionless URL.
 # The explicit index rule keeps the homepage at the root URL.
 RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
