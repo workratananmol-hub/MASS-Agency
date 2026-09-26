@@ -29,7 +29,7 @@
   logo.setAttribute("aria-label","MASS home");
   if(cta){cta.href="/contact";cta.innerHTML='Start a project <span aria-hidden="true">↗</span>'}
   const links=[
-    ["/","Home","01"],["/about","About","02"],["/website","Web Services","03"],
+    ["/","Home","01"],["/about","About","02"],["/web-development","Web Services","03"],
     ["/agentic-ai","AI Services","04"],["/contact","Contact","05"],
     ["/blog","Blog","06"]
   ];
