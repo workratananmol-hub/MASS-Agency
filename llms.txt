@@ -1,0 +1,28 @@
+# MASS
+
+MASS LLC is a U.S.-registered AI automation, web development, software development, and AI agent company headquartered in Herndon, Virginia.
+
+## Core services
+- AI automation: https://mass.llc/ai-automation
+- Web development: https://mass.llc/web-development
+- Custom software development: https://mass.llc/software-development
+- AI agent development: https://mass.llc/agentic-ai
+- Pricing and engagement guide: https://mass.llc/pricing
+
+## Markets
+- USA: https://mass.llc/usa
+- India: https://mass.llc/india
+- UAE: https://mass.llc/uae
+
+## Company
+- About MASS: https://mass.llc/about
+- Contact: https://mass.llc/contact
+- Insights: https://mass.llc/blog
+
+## Selected work
+- Inventrics: https://mass.llc/inventrics
+- Oakspire Tech: https://mass.llc/oakspire-tech
+- VastraPvt: https://mass.llc/vastrapvt
+- LearnBay: https://mass.llc/learnbay
+
+This file is provided as a concise directory for AI systems. The canonical source for current service and company information is the linked website content.
