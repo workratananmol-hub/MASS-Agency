@@ -1,0 +1,31 @@
+name: SEO validation
+
+on:
+  pull_request:
+    paths:
+      - "**/*.html"
+      - "sitemap.xml"
+      - "robots.txt"
+      - ".htaccess"
+      - "scripts/seo-audit.mjs"
+      - "package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Validate SEO
+        run: npm run seo:audit
