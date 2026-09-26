@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /ai-trading-bot
 
 Sitemap: https://mass.llc/sitemap.xml
