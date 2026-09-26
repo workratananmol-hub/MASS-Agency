@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://mass.llc/</loc><lastmod>2026-09-26</lastmod></url>
-  <url><loc>https://mass.llc/website</loc><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://mass.llc/web-development</loc><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://mass.llc/ai-automation</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/agentic-ai</loc><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://mass.llc/software-development</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/about</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/contact</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/blog</loc><lastmod>2026-09-07</lastmod></url>
