@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>How to Design an AI Support Agent with Escalation | MASS</title>
+    <title>AI Customer Support Agent: Architecture &amp; Escalation | MASS</title>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-S0TWT8QTLL"></script>
     <script>
@@ -14,7 +14,7 @@
         gtag('config', 'G-S0TWT8QTLL');
     </script>
     <meta name="description"
-        content="A practical guide to AI support agents: approved knowledge, escalation, evaluation, and failure handling. MASS does not publish a verified 80% containment result.">
+        content="Design an AI customer support agent with approved knowledge, deterministic tools, confidence-based escalation, human review, evaluation, logging, and failure handling.">
     <meta name="robots" content="index,follow">
     <meta name="author" content="MASS">
     <link rel="canonical" href="https://mass.llc/ai-support-agent-80-percent">
@@ -27,7 +27,7 @@
     <meta property="og:image" content="https://mass.llc/assets/blog/ai-support-agent.webp">
     <meta property="og:site_name" content="MASS">
     <meta property="article:published_time" content="2026-01-15">
-    <meta property="article:modified_time" content="2026-09-07">
+    <meta property="article:modified_time" content="2026-09-26">
     <meta property="article:section" content="AI Agents">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="How to Design an AI Support Agent with Escalation and Evaluation">
@@ -36,8 +36,9 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/style.css">
     <script
-        type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"How to Design an AI Support Agent with Escalation and Evaluation","description":"Implementation guide covering approved knowledge, escalation, evaluation, and failure handling. MASS does not publish a verified 80% containment result.","datePublished":"2026-01-15","dateModified":"2026-09-07","author":{"@type":"Organization","name":"MASS","url":"https://mass.llc/"},"publisher":{"@id":"https://mass.llc/"},"mainEntityOfPage":"https://mass.llc/ai-support-agent-80-percent","@id":"https://mass.llc/ai-support-agent-80-percent","url":"https://mass.llc/ai-support-agent-80-percent"}</script>
-    <script src="js/script.js?v=20260907-blog" defer></script>
+        type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"How to Design an AI Support Agent with Escalation and Evaluation","description":"Implementation guide covering approved knowledge, escalation, evaluation, and failure handling. MASS does not publish a verified 80% containment result.","image":"https://mass.llc/assets/blog/ai-support-agent.webp","datePublished":"2026-01-15","dateModified":"2026-09-26","author":{"@type":"Organization","name":"MASS","url":"https://mass.llc/"},"publisher":{"@type":"Organization","@id":"https://mass.llc/","name":"MASS","url":"https://mass.llc/","logo":{"@type":"ImageObject","url":"https://mass.llc/favicon.svg"}},"mainEntityOfPage":"https://mass.llc/ai-support-agent-80-percent","@id":"https://mass.llc/ai-support-agent-80-percent","url":"https://mass.llc/ai-support-agent-80-percent"}</script>
+        <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mass.llc/"},{"@type":"ListItem","position":2,"name":"Insights","item":"https://mass.llc/blog"},{"@type":"ListItem","position":3,"name":"Article","item":"https://mass.llc/ai-support-agent-80-percent"}]}</script>
+<script src="js/script.js?v=20260907-blog" defer></script>
 </head>
 
 <body class="article-page"><a class="skip" href="#main">Skip to content</a>
@@ -51,7 +52,7 @@
         <article>
             <header class="article-hero">
                 <div class="article-meta"><span>AI Agents · 11 min read</span><time datetime="2026-01-15">15 January
-                        2026 · Updated 7 September 2026</time></div>
+                        2026 · Updated 26 September 2026</time></div>
                 <h1>How to Design an AI Support Agent with <span class="serif">escalation and evaluation</span></h1>
                 <p class="article-deck">Approved knowledge, human handoff, evaluation, and failure handling. The URL still contains “80-percent”; MASS does not publish a verified 80% containment result.</p>
             </header>
@@ -61,7 +62,7 @@
                         href="#guardrails">Guardrails</a><a href="#evaluation">Evaluation</a><a href="#failure">Failure handling</a><a href="#faq">FAQ</a>
                 </aside>
                 <div class="article-body">
-                    <p class="quick-answer">Design a support agent around a named intent set, retrieval from approved content, deterministic account tools, confidence-based escalation, and continuous review of failed conversations. Do not advertise a containment percentage without a denominator, sample, time period, and definition of success.</p>
+                    <p class="quick-answer">Design a support agent around a named intent set, retrieval from approved content, deterministic account tools, confidence-based escalation, and continuous review of failed conversations. Do not advertise a containment percentage without a denominator, sample, time period, and definition of success. For implementation, see MASS’s <a href="/agentic-ai">AI agent development services</a>.</p>
                     <h2 id="claim">About the “80%” in this URL</h2>
                     <p>This page used to lead with “handles 80% of queries without human help.” MASS has not published a dataset, client, time window, or denominator that would support that figure. The number is therefore <strong>not a verified result</strong>. The URL is unchanged so existing links keep working. The article is an implementation guide.</p>
                     <p>If you later report containment, state all of the following in the same sentence: the intent groups included, the channel, the sample size, the dates, and whether “success” means the customer did not come back, a human agreed the answer was correct, or merely that no ticket was opened.</p>
