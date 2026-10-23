@@ -198,14 +198,14 @@
     }
     const subject = 'MIMS waitlist request';
     const body = `Please add me to the MIMS waitlist.\n\nEmail: ${email}\nRole: ${role}\n\nI understand that this opens my email app and I need to review and send the request.`;
-    const href = `mailto:contact@mass.llc?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const href = `mailto:info@mass.llc?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     status.replaceChildren('Your email app will open with a prepared request. Review and send it to complete the request. ');
     const fallback = document.createElement('a');
     fallback.href = href;
     fallback.textContent = 'Open the prepared email';
     fallback.className = 'text-link';
     status.append(fallback);
-    const fallbackText = `To: contact@mass.llc\nSubject: ${subject}\n\n${body}`;
+    const fallbackText = `To: info@mass.llc\nSubject: ${subject}\n\n${body}`;
     const copyBlock = document.createElement('div');
     copyBlock.className = 'waitlist-copy-fallback';
     const copyLabel = document.createElement('label');

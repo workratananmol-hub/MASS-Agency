@@ -26,11 +26,14 @@
   <link rel="stylesheet" href="/assets/mims/css/app.css?v=20261023">
   <link rel="stylesheet" href="/assets/mims/css/dashboard.css?v=20261023">
   <link rel="stylesheet" href="/assets/mims/css/revision-v3.css?v=20261023">
+  <link rel="stylesheet" href="/css/mass-footer.css?v=20261024-footer">
+  <script src="/assets/vendor/three.min.js" defer></script>
   <script src="/assets/mims/vendor/gsap.min.js?v=20261023" defer></script>
   <script src="/assets/mims/vendor/ScrollTrigger.min.js?v=20261023" defer></script>
-  <script src="/assets/mims/js/app.js?v=20261023" defer></script>
+  <script src="/assets/mims/js/app.js?v=20261024-contacts" defer></script>
   <script src="/assets/mims/js/dashboard.js?v=20261023" defer></script>
   <script src="/assets/mims/js/teaching-media.js?v=20261023" defer></script>
+  <script src="/js/mass-footer.js?v=20261024-footer" defer></script>
   <script src="/js/analytics-consent.js" defer></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://mass.llc/mims#webpage","url":"https://mass.llc/mims","name":"MIMS by MASS — A clearer way to teach","description":"MIMS is being built for teachers and schools to prepare visual explanations, editable teaching materials and assessments using curriculum resources already built into the system.","isPartOf":{"@id":"https://mass.llc/#website"},"inLanguage":"en"},{"@type":"SoftwareApplication","@id":"https://mass.llc/mims#software","name":"MIMS","applicationCategory":"EducationalApplication","operatingSystem":"Web","description":"A teaching system in development for visual explanations, editable materials and assessments using built-in curriculum resources.","provider":{"@type":"Organization","name":"MASS","url":"https://mass.llc/"},"url":"https://mass.llc/mims"}]}</script>
 </head>
@@ -205,9 +208,105 @@
 
     <section class="vision section-pad" id="vision" data-depth-scene><div class="vision-main"><p class="eyebrow">A broader tomorrow. A focused today.</p><h2>A broad teaching vision.<br><em>A focused first release.</em></h2><div class="subject-stack" aria-hidden="true"><div class="subject-sheet sheet-back depth-layer" data-depth="-5">All classes</div><div class="subject-sheet sheet-science depth-layer" data-depth="9">Science<div class="sheet-circles"></div></div><div class="subject-sheet sheet-english depth-layer" data-depth="15">English<div class="sheet-lines"></div></div><div class="subject-sheet sheet-social depth-layer" data-depth="21">Social science<div class="sheet-timeline"></div></div><div class="subject-sheet sheet-maths depth-layer" data-depth="28"><span>MIMS</span><strong>Mathematics</strong><svg viewBox="0 0 180 100"><path d="M15 80 70 17 125 80 170 40" fill="none" stroke="#82993a"/><circle cx="70" cy="17" r="4" fill="#82993a"/><circle cx="125" cy="80" r="4" fill="#82993a"/></svg><small>From knowledge to understanding.</small></div></div></div><div class="vision-description"><p class="eyebrow">Product vision</p><h3>All subjects.<br>All classes.</h3><p>From mathematics and English to science, social science and beyond—built for every class, with curriculum resources at the core.</p></div><div class="first-release"><p class="eyebrow">First release</p><h3>CBSE Classes 9–10<br>Mathematics</h3><ul><li>Teaching language: English</li><li>Class 10 Basic &amp; Standard</li><li>Planned web app</li><li>Individual &amp; school access</li></ul></div></section>
 
-    <section class="waitlist section-pad" id="waitlist"><div class="waitlist-intro"><p class="eyebrow">Join the waitlist</p><h2>Help shape<br><em>clearer teaching.</em></h2><p>Join the MIMS waitlist for individual and school access updates.</p></div><form id="waitlist-form" class="waitlist-form"><label class="sr-only" for="email">Email address</label><input id="email" name="email" type="email" placeholder="Email address" autocomplete="email" required><label class="sr-only" for="role">Your role</label><select id="role" name="role" required><option value="" disabled selected>Teacher / School leader</option><option>Teacher</option><option>School leader</option><option>Other</option></select><button class="button button-lime" type="submit">Join the waitlist <svg class="icon"><use href="#arrow"/></svg></button><p class="form-caption">Your email app will open with a prepared request. Review it and send it to join the waitlist.</p><p id="form-status" class="form-status" role="status"></p></form><div class="questions"><p class="eyebrow">Questions</p><details><summary>When can I access MIMS?<span aria-hidden="true"></span></summary><p>MIMS is in development. A launch date has not been announced. The first release is planned as a web app.</p></details><details><summary>Will materials be editable?<span aria-hidden="true"></span></summary><p>Editable PowerPoint and teaching documents are part of the planned experience, so teachers can review and adapt the work.</p></details><details open><summary>Do I need to upload textbooks?<span aria-hidden="true"></span></summary><p>No. Curriculum resources are built in. Tell MIMS the teaching work you need, then review and edit the result.</p></details><details><summary>Which subjects are available first?<span aria-hidden="true"></span></summary><p>The first release focuses on CBSE Classes 9–10 Mathematics in English, including Class 10 Basic and Standard. Other subjects and classes are part of the wider vision.</p></details></div></section>
+    <section class="waitlist section-pad" id="waitlist"><div class="waitlist-intro"><p class="eyebrow">Join the waitlist</p><h2>Help shape<br><em>clearer teaching.</em></h2><p>Join the MIMS waitlist for individual and school access updates.</p><p class="form-caption">MIMS is in development. Interface views on this page illustrate the planned web experience.</p></div><form id="waitlist-form" class="waitlist-form"><label class="sr-only" for="email">Email address</label><input id="email" name="email" type="email" placeholder="Email address" autocomplete="email" required><label class="sr-only" for="role">Your role</label><select id="role" name="role" required><option value="" disabled selected>Teacher / School leader</option><option>Teacher</option><option>School leader</option><option>Other</option></select><button class="button button-lime" type="submit">Join the waitlist <svg class="icon"><use href="#arrow"/></svg></button><p class="form-caption">Your email app will open with a prepared request. Review it and send it to join the waitlist.</p><p id="form-status" class="form-status" role="status"></p></form><div class="questions"><p class="eyebrow">Questions</p><details><summary>When can I access MIMS?<span aria-hidden="true"></span></summary><p>MIMS is in development. A launch date has not been announced. The first release is planned as a web app.</p></details><details><summary>Will materials be editable?<span aria-hidden="true"></span></summary><p>Editable PowerPoint and teaching documents are part of the planned experience, so teachers can review and adapt the work.</p></details><details open><summary>Do I need to upload textbooks?<span aria-hidden="true"></span></summary><p>No. Curriculum resources are built in. Tell MIMS the teaching work you need, then review and edit the result.</p></details><details><summary>Which subjects are available first?<span aria-hidden="true"></span></summary><p>The first release focuses on CBSE Classes 9–10 Mathematics in English, including Class 10 Basic and Standard. Other subjects and classes are part of the wider vision.</p></details></div></section>
   </main>
-  <footer class="site-footer dark"><a class="wordmark" href="/">MASS</a><span>MIMS by MASS</span><a href="/campus">Campus AI sessions</a><a href="/about">About</a><a href="mailto:contact@mass.llc">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a class="footer-email" href="mailto:contact@mass.llc">contact@mass.llc</a><span class="prototype-caption">MIMS is in development. Interface views on this page illustrate the planned web experience.</span></footer>
+  <footer class="footer mass-footer">
+        <div class="footer__inner">
+            <div class="footer__top">
+                <a href="/" class="footer__logo">MASS</a>
+                <a href="mailto:info@mass.llc" class="btn footer__email-btn">info@mass.llc</a>
+            </div>
+            <div class="footer__grid">
+                <div>
+                    <p class="footer__col-header">Pages</p>
+                    <ul class="footer__col-list">
+                        <li><a href="/">Home <span>→</span></a></li>
+                        <li><a href="/about">About <span>→</span></a></li>
+                        <li><a href="/contact">Contact <span>→</span></a></li>
+                        <li><a href="/blog">Blogs <span>→</span></a></li>
+                        <li><a href="/campus">Campus AI sessions <span>→</span></a></li>
+                        <li><a href="/terms">Terms <span>→</span></a></li>
+                        <li><a href="/privacy">Privacy <span>→</span></a></li>
+
+                        <li><a href="/mims">MIMS <span>→</span></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer__col-header">Services</p>
+                    <ul class="footer__col-list">
+                        <li><a href="/web-development">Website <span>→</span></a></li>
+                        <li><a href="/agentic-ai">Agentic AI <span>→</span></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer__col-header">Social</p>
+                    <ul class="footer__col-list footer__social-list" aria-label="Social profiles">
+                        <li><a class="footer-social-button" href="https://www.instagram.com/ma_software_solutions/"
+                                target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg
+                                    viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="3" y="3" width="18" height="18" rx="5" />
+                                    <circle cx="12" cy="12" r="4" />
+                                    <circle cx="17.5" cy="6.5" r="1" />
+                                </svg></a></li>
+                        <li><a class="footer-social-button" href="https://www.linkedin.com/company/mass-growth-partner/"
+                                target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24"
+                                    aria-hidden="true">
+                                    <path
+                                        d="M6 9v9M6 6.5v.01M10 18v-5.2c0-2 1.2-3.2 2.9-3.2s3.1 1.2 3.1 3.5V18M10 12v6" />
+                                </svg></a></li>
+                        <li><a class="footer-social-button" href="https://www.reddit.com/user/Ratan_Anmol1094/"
+                                target="_blank" rel="noopener noreferrer" aria-label="Reddit"><svg viewBox="0 0 24 24"
+                                    aria-hidden="true">
+                                    <circle cx="12" cy="13" r="7" />
+                                    <circle cx="9" cy="12" r="1" />
+                                    <circle cx="15" cy="12" r="1" />
+                                    <path d="M8.5 15c2 1.5 5 1.5 7 0M13 6l1-3 3 1M6 10 4 9M18 10l2-1" />
+                                </svg></a></li>
+                        <li><a class="footer-social-button" href="https://x.com/anmol_rata92354" target="_blank"
+                                rel="noopener noreferrer" aria-label="X"><svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M5 4l14 16M19 4L5 20" />
+                                </svg></a></li>
+                        <li><a class="footer-social-button" href="https://www.threads.com/@ma_software_solutions"
+                                target="_blank" rel="noopener noreferrer" aria-label="Threads"><svg viewBox="0 0 24 24"
+                                    aria-hidden="true">
+                                    <path
+                                        d="M17.5 8.5c-1-3-3.1-4.5-5.7-4.5C7.7 4 5 7.1 5 12s2.7 8 7 8c4.1 0 6.7-2.3 6.7-5.4 0-2.7-2-4.5-5-4.5-2.8 0-4.7 1.4-4.7 3.5 0 1.7 1.3 2.8 3.1 2.8 2.6 0 4.2-2.2 4.2-5.2 0-2.6-1.1-4.1-2.9-4.1-1.4 0-2.5.7-3 1.7" />
+                                </svg></a></li>
+                        <li><button class="footer-social-button" type="button"
+                                aria-label="Facebook — link coming soon"><svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path
+                                        d="M14 21v-8h3l.5-3H14V8.4c0-.9.3-1.5 1.6-1.5H18V4.2c-.4-.1-1.3-.2-2.4-.2-2.4 0-4.1 1.5-4.1 4.2V10H9v3h2.5v8" />
+                                </svg></button></li>
+                        <li><button class="footer-social-button" type="button"
+                                aria-label="GitHub — link coming soon"><svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path
+                                        d="M8 19c-4 1-4-2-6-2m12 4v-3a3 3 0 0 0-.8-2.4c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.2s-1-.3-3.3 1.3a11.4 11.4 0 0 0-6 0C5.8 3 4.8 3.3 4.8 3.3a4.4 4.4 0 0 0-.1 3.2 4.7 4.7 0 0 0-1.3 3.2c0 4.7 2.8 5.7 5.5 6A3 3 0 0 0 8 18v3" />
+                                </svg></button></li>
+                        <li><button class="footer-social-button" type="button"
+                                aria-label="YouTube — link coming soon"><svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M21 12c0 4-1 6-3 6H6c-2 0-3-2-3-6s1-6 3-6h12c2 0 3 2 3 6z" />
+                                    <path d="m10 9 5 3-5 3z" />
+                                </svg></button></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer__col-header">Contact</p>
+                    <div class="footer__col-list footer__contact">
+                        <p>Launders St, Herndon, VA 20171<br>United States</p>
+                        <p><a href="mailto:info@mass.llc">info@mass.llc</a></p>
+                        <p><a href="tel:+15404887038">+1 540 488 7038</a></p>
+                        <p><a href="tel:+917483509091" aria-label="Call MASS in India at +91 7483509091">+91 7483509091</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <p>© 2022 MASS LLC · All rights reserved.</p>
+                <p>Designed &amp; built by MASS</p>
+            </div>
+            <div class="footer__watermark" aria-hidden="true">MA Software Solutions</div>
+            <div id="footer-wave" class="footer__wave-canvas" aria-hidden="true"></div>
+        </div>
+    </footer>
   <dialog id="proof-dialog" class="proof-dialog"><div class="dialog-heading"><div><p class="eyebrow">Revised teaching diagram</p><h2 id="proof-title">Visual explanation</h2></div><button class="dialog-close" aria-label="Close preview"><svg class="icon"><use href="#close"/></svg></button></div><div id="proof-dialog-image" class="dialog-image"></div><p>Revised explanatory diagram. The original presentation excerpt is retained in the source archive.</p></dialog>
 </body>
 </html>
