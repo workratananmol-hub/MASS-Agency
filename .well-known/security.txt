@@ -1,4 +1,4 @@
-Contact: mailto:contact@mass.llc
+Contact: mailto:info@mass.llc
 Expires: 2027-08-29T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://mass.llc/.well-known/security.txt
