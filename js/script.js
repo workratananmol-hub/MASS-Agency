@@ -30,8 +30,8 @@
   if(cta){cta.href="/contact";cta.innerHTML='Start a project <span aria-hidden="true">↗</span>'}
   const links=[
     ["/","Home","01"],["/about","About","02"],["/web-development","Web Services","03"],
-    ["/agentic-ai","AI Services","04"],["/contact","Contact","05"],
-    ["/blog","Blog","06"]
+    ["/agentic-ai","AI Services","04"],["/mims","MIMS","05"],["/campus","Campus","06"],
+    ["/contact","Contact","07"],["/blog","Blog","08"]
   ];
   const art=[
     '<circle cx="105" cy="105" r="70"/><circle cx="105" cy="105" r="38"/><path d="M105 18v174M18 105h174"/>',
@@ -48,7 +48,7 @@
     <div class="mass-menu-panel"><div class="mass-menu-layout">
       <nav class="mass-menu-nav" aria-label="Full navigation"><p class="mass-menu-eyebrow">Navigate / MASS</p><ol class="mass-menu-list">${links.map(([href,label,num],i)=>`<li><a class="mass-menu-link" data-shape="${i}" href="${href}"${((href===current)||(href==="index.html"&&current===""))?' aria-current="page"':''}><span class="mass-menu-number">${num}</span><span>${label}</span><span class="mass-menu-arrow" aria-hidden="true">↗</span></a></li>`).join("")}</ol></nav>
       <aside class="mass-menu-visual" aria-hidden="true"><p>Digital systems<br>built to move.</p><div class="mass-menu-arts">${art.map((paths,i)=>`<svg class="mass-menu-art${i===0?' is-active':''}" data-art="${i}" viewBox="0 0 210 210" fill="none">${paths}</svg>`).join("")}</div><span>Herndon, Virginia · 38.9696° N</span></aside>
-      <div class="mass-menu-meta"><a href="mailto:contact@mass.llc">contact@mass.llc</a><span>Web development + Agentic AI</span></div>
+      <div class="mass-menu-meta"><a href="mailto:contact@mass.llc">contact@mass.llc</a><span>Web, AI and learning systems</span></div>
     </div></div>`;
   document.body.appendChild(overlay);
   const backdrop=overlay.querySelector(".mass-menu-backdrop"),panel=overlay.querySelector(".mass-menu-panel"),layers=[...overlay.querySelectorAll(".mass-menu-layer")],menuLinks=[...overlay.querySelectorAll(".mass-menu-link")],arts=[...overlay.querySelectorAll(".mass-menu-art")];
@@ -327,8 +327,7 @@ document.addEventListener("click",event=>{
   }catch{}
 });
 
-const form=document.querySelector("#contact-form");
-form?.addEventListener("submit",e=>{e.preventDefault();let ok=true;const fields=[...form.querySelectorAll("[required]")];fields.forEach(f=>{const err=f.parentElement.querySelector(".error");let msg="";if(!f.value.trim())msg="This field is required.";else if(f.type==="email"&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value))msg="Enter a valid email address.";f.setAttribute("aria-invalid",msg?"true":"false");if(err)err.textContent=msg;ok=!msg&&ok});if(ok){trackMassEvent("generate_lead",{method:"email_brief"});const name=form.name.value.trim(),email=form.email.value.trim(),company=form.company.value.trim(),message=form.message.value.trim(),budget=form.budget.value.trim();const body=["Name: "+name,"Email: "+email,company?"Company: "+company:null,budget?"Budget range: "+budget:null,"",message].filter(line=>line!==null).join("\n");const mailto="mailto:contact@mass.llc?subject="+encodeURIComponent("Project brief from "+name)+"&body="+encodeURIComponent(body);form.reset();form.hidden=true;const success=document.querySelector(".success");success.classList.add("show");success.focus();window.location.href=mailto}});
+const form=document.querySelector("#contact-form");form?.addEventListener("submit",event=>{event.preventDefault();let valid=true;const fields=[...form.querySelectorAll("[required]")];fields.forEach(field=>{const error=field.parentElement.querySelector(".error");let errorMessage="";if(!field.value.trim())errorMessage="This field is required.";else if(field.type==="email"&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value))errorMessage="Enter a valid email address.";field.setAttribute("aria-invalid",errorMessage?"true":"false");if(error)error.textContent=errorMessage;valid=!errorMessage&&valid});if(!valid)return;const name=form.name.value.trim(),email=form.email.value.trim(),company=form.company.value.trim(),details=form.message.value.trim(),budget=form.budget.value.trim(),body=["Name: "+name,"Email: "+email,company?"Company: "+company:null,budget?"Budget range: "+budget:null,"",details].filter(line=>line!==null).join("\n"),mailto="mailto:contact@mass.llc?subject="+encodeURIComponent("Project brief from "+name)+"&body="+encodeURIComponent(body),success=document.querySelector(".success"),fallback=document.querySelector("#contact-email-fallback");if(success){success.classList.add("show");success.focus();const status=success.querySelector("p");if(status)status.textContent="Your email app will open with this brief ready for review. Send the email to share it with MASS."}if(fallback){const output=fallback.querySelector("textarea"),emailLink=fallback.querySelector("a"),copyButton=fallback.querySelector("button");if(output)output.value=body;if(emailLink)emailLink.href=mailto;if(copyButton)copyButton.onclick=async()=>{try{await navigator.clipboard.writeText(body);copyButton.textContent="Copied"}catch{if(output){output.focus();output.select()}}};fallback.hidden=false}trackMassEvent("contact_email_prepared",{method:"email_brief"});window.location.href=mailto});
 if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&navigator.hardwareConcurrency>4){document.addEventListener("pointermove",e=>{document.documentElement.style.setProperty("--mx",e.clientX+"px");document.documentElement.style.setProperty("--my",e.clientY+"px")},{passive:true})}
 (()=>{
   const fine=matchMedia("(hover: hover) and (pointer: fine)").matches,reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;

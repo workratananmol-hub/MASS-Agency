@@ -1,14 +1,9 @@
-name: SEO validation
+name: Release validation
 
 on:
+  push:
+    branches: [seo/deploy-ready]
   pull_request:
-    paths:
-      - "**/*.html"
-      - "sitemap.xml"
-      - "robots.txt"
-      - ".htaccess"
-      - "scripts/seo-audit.mjs"
-      - "package.json"
   workflow_dispatch:
 
 permissions:
@@ -23,9 +18,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '22'
           cache: npm
       - name: Install
         run: npm ci
-      - name: Validate SEO
+      - name: Validate site and references
         run: npm run seo:audit

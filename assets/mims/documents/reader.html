@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex, follow"><title>MIMS — Complete sample PDF</title><style>
+@font-face{font-family:Instrument;src:url('../fonts/InstrumentSans-Variable.woff2')}*{box-sizing:border-box}body{margin:0;background:#e9ece4;color:#25311e;font:13px Instrument,Arial,sans-serif}header{display:flex;position:sticky;top:0;z-index:2;align-items:center;gap:14px;min-height:52px;padding:10px 16px;background:#fafaf7;border-bottom:1px solid #cbd3c0;flex-wrap:wrap}header>strong{font-size:12px;margin-right:auto;font-weight:550}label{display:flex;gap:6px;align-items:center;font-size:11px}select{min-height:30px;font:12px Instrument,Arial,sans-serif;border:1px solid #bdc9ac;border-radius:3px;background:#fafaf7;color:inherit}a{color:inherit;text-underline-offset:3px;font-size:11px}.status{padding:16px;line-height:1.5;margin:0;font-size:12px}main{padding:15px;display:flex;flex-direction:column;gap:20px;align-items:center}.pdf-page{margin:0;width:min(100%,900px);scroll-margin-top:82px}canvas{display:block;width:100%;height:auto;background:#fafaf7;box-shadow:0 2px 7px #1e301018}figcaption{padding:9px 0;font-size:11px;text-align:center;color:#59684b}details{width:min(100%,900px);margin:0 auto 20px;padding:14px;border-top:1px solid #c4ceba;background:#f3f5ee}summary{cursor:pointer;font-size:12px}.page-text{white-space:pre-wrap;line-height:1.6;font-size:13px;margin-top:15px}button:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #596c33;outline-offset:3px}@media(max-width:480px){header{gap:10px;padding:10px}header>strong{width:100%}main{padding:8px}.status{padding:12px}}
+</style></head><body><header><strong id="title">Complete sample PDF</strong><label>Page <select id="page" aria-label="Go to page" disabled></select><span id="count"></span></label><a id="download" download>Download PDF</a></header><p class="status" id="status" role="status">Loading the complete document…</p><main id="pages" aria-label="All document pages"></main><details><summary>Read document text</summary><div id="text"></div></details><script type="module">
+import * as pdfjs from '../vendor/pdfjs/pdf.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdfjs/pdf.worker.mjs',import.meta.url).href;
+const allowed = {'class10-trigonometry-test.pdf':'Classroom test','class10-trigonometry-worked-key.pdf':'Worked answer key'};
+const file = new URL(location.href).searchParams.get('file');
+const title = document.querySelector('#title'), status = document.querySelector('#status'), pages = document.querySelector('#pages'), selector = document.querySelector('#page');
+async function load(){
+ if(!allowed[file])throw new Error('Choose a published MIMS sample PDF.');
+ title.textContent=allowed[file];document.title=allowed[file]+' — MIMS PDF';
+ document.querySelector('#download').href=file;
+ const pdf=await pdfjs.getDocument({url:file,standardFontDataUrl:'../vendor/pdfjs/standard_fonts/'}).promise;
+ document.querySelector('#count').textContent='/ '+pdf.numPages;
+ for(let n=1;n<=pdf.numPages;n++){
+  const page=await pdf.getPage(n), viewport=page.getViewport({scale:1.55});
+  const figure=document.createElement('figure');figure.className='pdf-page';figure.id='page-'+n;
+  const canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);canvas.setAttribute('aria-label','Page '+n+' of '+pdf.numPages);
+  const caption=document.createElement('figcaption');caption.textContent='Page '+n+' of '+pdf.numPages;
+  figure.append(canvas,caption);pages.append(figure);
+  await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+  const text=await page.getTextContent();const block=document.createElement('p');block.className='page-text';block.textContent='Page '+n+'\n'+text.items.map(item=>item.str+(item.hasEOL?'\n':' ')).join('');document.querySelector('#text').append(block);
+  const option=document.createElement('option');option.value=n;option.textContent=n;selector.append(option);
+  status.textContent='Loaded '+n+' of '+pdf.numPages+' pages…';
+ }
+ selector.disabled=false;selector.value='1';status.textContent='Complete original PDF · '+pdf.numPages+' pages. Scroll to read, or choose a page above.';
+ document.body.dataset.pdfLoaded='true';
+}
+selector.addEventListener('change',()=>document.querySelector('#page-'+selector.value)?.scrollIntoView({block:'start'}));
+load().catch(error=>{status.textContent='The inline reader could not load. Use Download PDF to open the complete file.';console.error('PDF sample reader:',error.message);});
+</script></body></html>

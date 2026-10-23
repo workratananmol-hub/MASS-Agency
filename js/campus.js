@@ -23,3 +23,12 @@ document.querySelector('#copy-enquiry').addEventListener('click', async () => {
     status.textContent = 'Select and copy the enquiry below, then send it to info@mass.llc.';
   }
 });
+
+const campusMenu = document.querySelector('.campus-mobile-menu');
+campusMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { campusMenu.open = false; }));
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && campusMenu?.open) { campusMenu.open = false; campusMenu.querySelector('summary').focus(); }
+});
+document.addEventListener('click', event => {
+  if (campusMenu?.open && !campusMenu.contains(event.target)) campusMenu.open = false;
+});

@@ -1,6 +1,6 @@
 # MASS
 
-MASS LLC is a U.S.-registered AI automation, web development, software development, and AI agent company headquartered in Herndon, Virginia.
+MASS LLC builds practical AI automation, websites, software, AI agents and education-focused product experiences.
 
 ## Core services
 - AI automation: https://mass.llc/ai-automation
@@ -8,6 +8,11 @@ MASS LLC is a U.S.-registered AI automation, web development, software developme
 - Custom software development: https://mass.llc/software-development
 - AI agent development: https://mass.llc/agentic-ai
 - Pricing and engagement guide: https://mass.llc/pricing
+
+## Products and programmes
+- MIMS: https://mass.llc/mims
+  - MIMS is a teaching system in development. Its first release is planned for CBSE Classes 9–10 Mathematics in English, including Class 10 Basic and Standard. Broader subjects and grades are product vision, not current availability.
+- Campus AI sessions: https://mass.llc/campus
 
 ## Markets
 - USA: https://mass.llc/usa
@@ -25,4 +30,4 @@ MASS LLC is a U.S.-registered AI automation, web development, software developme
 - VastraPvt: https://mass.llc/vastrapvt
 - LearnBay: https://mass.llc/learnbay
 
-This file is provided as a concise directory for AI systems. The canonical source for current service and company information is the linked website content.
+This file is a concise directory for AI systems. The linked site pages are the canonical source for current service and company information.

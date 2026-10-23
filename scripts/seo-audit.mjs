@@ -1,131 +1,270 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
-const root=process.cwd();
-const files=fs.readdirSync(root);
-const htmlFiles=files.filter(name=>name.endsWith(".html")).sort();
-const errors=[];
-const warnings=[];
-const canonicalToFile=new Map();
+const root = process.cwd();
+const errors = [];
+const warnings = [];
+const siteOrigin = "https://mass.llc";
+const redirectSources = new Set(["404.html", "500.html", "aimee.html", "website.html"]);
+const urlAttributes = new Set(["href", "src", "poster", "action"]);
+const assetExtensions = /\.(?:avif|css|gif|ico|jpe?g|js|json|mjs|mp4|pdf|png|svg|ttf|txt|webm|webmanifest|woff2)(?:[?#]|$)/i;
 
-const read=file=>fs.readFileSync(path.join(root,file),"utf8");
-const stripHashAndQuery=value=>value.split("#")[0].split("?")[0];
-const publicUrlFor=file=>file==="index.html"?"https://mass.llc/":`https://mass.llc/${file.replace(/\.html$/,"")}`;
-const isNoindex=html=>/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
-const getMatches=(html,re)=>[...html.matchAll(re)].map(m=>m[1]??m[0]);
+const posix = path.posix;
+const relative = file => file.split(path.sep).join("/");
+const read = file => fs.readFileSync(path.join(root, file), "utf8");
+const isHtml = file => file.toLowerCase().endsWith(".html");
+const stripQueryAndHash = value => value.split("#")[0].split("?")[0];
+const fragmentOf = value => value.includes("#") ? decodeURIComponent(value.slice(value.indexOf("#") + 1)) : "";
+const isSameOrigin = value => value.toLowerCase().startsWith(`${siteOrigin}/`) || value.toLowerCase() === siteOrigin;
+const isExternal = value => /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(value) && !isSameOrigin(value);
+const ignoredUrl = value => !value || value === "#" || isExternal(value);
+const normalizedText = value => value.replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim().toLowerCase();
 
-const routeExists=route=>{
-  const clean=stripHashAndQuery(route);
-  if(clean==="/"||clean==="") return true;
-  if(clean.startsWith("/assets/")||clean.startsWith("/css/")||clean.startsWith("/js/")||clean.startsWith("/.well-known/")) return true;
-  const trimmed=clean.replace(/^\//,"").replace(/\/$/,"");
-  if(!trimmed) return true;
-  if(fs.existsSync(path.join(root,trimmed))) return true;
-  if(fs.existsSync(path.join(root,`${trimmed}.html`))) return true;
-  return false;
-};
+function walk(directory = "") {
+  const target = path.join(root, directory);
+  return fs.readdirSync(target, { withFileTypes: true }).flatMap(entry => {
+    const next = path.join(directory, entry.name);
+    if (entry.isDirectory()) return [".git", "node_modules", "docs", "output", "scripts"].includes(entry.name) ? [] : walk(next);
+    return [next];
+  });
+}
 
-for(const file of htmlFiles){
-  const html=read(file);
-  const noindex=isNoindex(html);
+const allFiles = walk();
+const allHtml = allFiles.filter(isHtml).sort();
+const rootHtml = allHtml.filter(file => !file.includes(path.sep));
+const publicHtml = rootHtml.filter(file => !redirectSources.has(file));
 
-  const titles=getMatches(html,/<title>([\s\S]*?)<\/title>/gi);
-  if(titles.length!==1) errors.push(`${file}: expected exactly one <title>, found ${titles.length}`);
+function exactFile(relPath) {
+  const segments = relPath.split("/").filter(Boolean);
+  let current = root;
+  for (const segment of segments) {
+    if (segment === "." || segment === "..") return { exists: false, detail: "invalid path segment" };
+    let entries;
+    try { entries = fs.readdirSync(current); } catch { return { exists: false, detail: "parent directory missing" }; }
+    const exact = entries.find(entry => entry === segment);
+    if (!exact) {
+      const caseVariant = entries.find(entry => entry.toLowerCase() === segment.toLowerCase());
+      return caseVariant
+        ? { exists: false, detail: `case mismatch; expected ${caseVariant}` }
+        : { exists: false, detail: "file missing" };
+    }
+    current = path.join(current, exact);
+  }
+  return { exists: fs.existsSync(current), detail: "" };
+}
 
-  const descriptions=getMatches(html,/<meta\s+name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/gi);
-  if(!noindex && descriptions.length!==1) errors.push(`${file}: expected one meta description, found ${descriptions.length}`);
+function resolveLocal(fromFile, raw) {
+  const localRaw = isSameOrigin(raw) ? new URL(raw).pathname + new URL(raw).search + new URL(raw).hash : raw;
+  const urlPath = stripQueryAndHash(localRaw.trim());
+  if (ignoredUrl(urlPath)) return { ignored: true };
+  let candidate;
+  if (urlPath.startsWith("/")) candidate = urlPath.slice(1);
+  else candidate = posix.join(posix.dirname(relative(fromFile)), urlPath);
+  candidate = posix.normalize(candidate).replace(/^\.\//, "");
+  if (candidate === "." || candidate === "") return { file: "index.html", fragment: fragmentOf(raw), route: true };
+  if (candidate.startsWith("../") || candidate === "..") return { error: "path escapes the deployment root" };
 
-  const canonicals=getMatches(html,/<link\s+rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/gi);
-  if(!noindex && canonicals.length!==1) errors.push(`${file}: expected one canonical, found ${canonicals.length}`);
-  if(canonicals.length===1){
-    const canonical=canonicals[0];
-    if(!canonical.startsWith("https://mass.llc/")) errors.push(`${file}: canonical is off-domain: ${canonical}`);
-    if(/\.html(?:$|[?#])/.test(canonical)||/\/index(?:$|[?#])/.test(canonical)) errors.push(`${file}: canonical is not extensionless/root-normalized: ${canonical}`);
-    if(!noindex){
-      const expected=publicUrlFor(file);
-      // website.html is retained only as a redirect source and canonicals to /web-development.
-      if(file!=="website.html" && canonical!==expected) errors.push(`${file}: canonical ${canonical} does not match expected ${expected}`);
-      if(canonicalToFile.has(canonical) && canonicalToFile.get(canonical)!==file && file!=="website.html"){
-        errors.push(`${file}: duplicate canonical also used by ${canonicalToFile.get(canonical)}: ${canonical}`);
-      } else canonicalToFile.set(canonical,file);
+  const direct = exactFile(candidate);
+  if (direct.exists) return { file: candidate, fragment: fragmentOf(raw) };
+  const noTrailingSlash = candidate.replace(/\/$/, "");
+  const route = exactFile(`${noTrailingSlash}.html`);
+  if (route.exists) return { file: `${noTrailingSlash}.html`, fragment: fragmentOf(raw), route: true };
+  return { error: direct.detail || route.detail || "file missing", candidate };
+}
+
+function idSet(file) {
+  const html = read(file);
+  return new Set([...html.matchAll(/\bid=["']([^"']+)["']/gi)].map(match => match[1]));
+}
+
+function checkReference(fromFile, raw, context) {
+  if (raw.startsWith("#") && raw !== "#") {
+    const fragment = fragmentOf(raw);
+    if (fragment && !idSet(fromFile).has(fragment)) errors.push(`${fromFile}: ${context} ${raw} targets a missing same-page fragment`);
+    return;
+  }
+  if (ignoredUrl(raw)) return;
+  const resolved = resolveLocal(fromFile, raw);
+  if (resolved.error) {
+    errors.push(`${fromFile}: ${context} ${raw} does not resolve (${resolved.error}${resolved.candidate ? `: ${resolved.candidate}` : ""})`);
+    return;
+  }
+  if (resolved.fragment && isHtml(resolved.file) && !idSet(resolved.file).has(resolved.fragment)) {
+    errors.push(`${fromFile}: ${context} ${raw} targets missing fragment #${resolved.fragment} in ${resolved.file}`);
+  }
+  if (context === "href" && /\.html(?:[?#]|$)/i.test(raw) && !resolved.file.includes("assets/") && !resolved.file.includes(".well-known/")) {
+    errors.push(`${fromFile}: public link must use the extensionless route: ${raw}`);
+  }
+}
+
+function valuesFromHtml(html) {
+  const values = [];
+  for (const tag of html.matchAll(/<[^>]+>/g)) {
+    const source = tag[0];
+    for (const attr of source.matchAll(/\s([:\w-]+)\s*=\s*(["'])([\s\S]*?)\2/g)) {
+      const name = attr[1].toLowerCase();
+      const value = attr[3].trim();
+      if (urlAttributes.has(name) || (/^data-[\w-]*(?:src|href|url)$/i.test(name))) values.push({ name, value });
+      if (name === "srcset") {
+        for (const item of value.split(",")) {
+          const candidate = item.trim().split(/\s+/)[0];
+          if (candidate) values.push({ name: "srcset", value: candidate });
+        }
+      }
+      if (name === "style") {
+        for (const item of value.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/gi)) values.push({ name: "style url", value: item[1] });
+      }
+    }
+    if (/^<meta\b/i.test(source)) {
+      const property = /\s(?:name|property)\s*=\s*["']([^"']+)["']/i.exec(source)?.[1].toLowerCase();
+      const content = /\scontent\s*=\s*["']([^"']+)["']/i.exec(source)?.[1];
+      if (content && ["og:image", "twitter:image", "og:url", "twitter:url"].includes(property)) values.push({ name: property, value: content });
     }
   }
-
-  const h1Count=(html.match(/<h1\b/gi)||[]).length;
-  if(!noindex && h1Count!==1) errors.push(`${file}: expected exactly one H1, found ${h1Count}`);
-
-  if(/<meta\s+name=["']keywords["']/i.test(html)) warnings.push(`${file}: obsolete meta keywords tag remains`);
-
-  for(const block of html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)){
-    const raw=block[1].trim();
-    if(!raw) continue;
-    try{JSON.parse(raw)}catch(error){errors.push(`${file}: invalid JSON-LD: ${error.message}`)}
-  }
-
-  for(const href of getMatches(html,/<a\b[^>]*href=["']([^"']+)["'][^>]*>/gi)){
-    if(!href||href.startsWith("#")||href.startsWith("mailto:")||href.startsWith("tel:")||href.startsWith("javascript:")) continue;
-    if(/^https?:\/\//i.test(href)) continue;
-    if(!href.startsWith("/")) continue;
-    if(!routeExists(href)) errors.push(`${file}: internal link does not resolve in repo: ${href}`);
-    if(/^\/website(?:[/?#]|$)/.test(href)) errors.push(`${file}: stale /website internal link remains: ${href}`);
-    if(/\.html(?:[?#]|$)/.test(href)) warnings.push(`${file}: internal link uses .html: ${href}`);
-  }
+  return values;
 }
 
-const sitemapPath=path.join(root,"sitemap.xml");
-if(!fs.existsSync(sitemapPath)) errors.push("sitemap.xml: missing");
-else{
-  const xml=read("sitemap.xml");
-  const urls=getMatches(xml,/<loc>([^<]+)<\/loc>/gi);
-  const seen=new Set();
-  for(const url of urls){
-    if(seen.has(url)) errors.push(`sitemap.xml: duplicate URL: ${url}`);
-    seen.add(url);
-    if(!url.startsWith("https://mass.llc/")) errors.push(`sitemap.xml: off-domain URL: ${url}`);
-    if(/\.html(?:$|[?#])/.test(url)||/\/index(?:$|[?#])/.test(url)||url==="https://mass.llc/website") errors.push(`sitemap.xml: noncanonical URL: ${url}`);
-    const route=new URL(url).pathname;
-    if(!routeExists(route)) errors.push(`sitemap.xml: URL has no deployable file: ${url}`);
-    const file=route==="/"
-      ?"index.html"
-      :`${route.replace(/^\//,"").replace(/\/$/,"")}.html`;
-    if(fs.existsSync(path.join(root,file)) && isNoindex(read(file))) errors.push(`sitemap.xml: noindex page included: ${url}`);
+function metadataValues(html, name) {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return [...html.matchAll(new RegExp(`<meta\\s+[^>]*(?:name|property)=["']${escaped}["'][^>]*>`, "gi"))];
+}
+
+const canonicalOwners = new Map();
+const inbound = new Map(publicHtml.map(file => [file, new Set()]));
+const titleOwners = new Map();
+const descriptionOwners = new Map();
+for (const file of allHtml) {
+  const html = read(file);
+  for (const { name, value } of valuesFromHtml(html)) {
+    checkReference(file, value, name);
+    if (name === "href") {
+      const resolved = resolveLocal(file, value);
+      if (resolved.file && inbound.has(resolved.file)) inbound.get(resolved.file).add(file);
+    }
   }
-  for(const [canonical,file] of canonicalToFile.entries()){
-    if(file==="404.html"||file==="500.html"||file==="website.html") continue;
-    if(!isNoindex(read(file)) && !seen.has(canonical)) warnings.push(`sitemap.xml: indexable canonical missing from sitemap: ${canonical} (${file})`);
+  for (const script of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+    for (const imported of script[1].matchAll(/\bimport\s+(?:[\s\S]*?\s+from\s+)?["']([^"']+)["']/gi)) {
+      checkReference(file, imported[1], "module import");
+    }
   }
 }
 
-const robotsPath=path.join(root,"robots.txt");
-if(!fs.existsSync(robotsPath)) errors.push("robots.txt: missing");
-else{
-  const robots=read("robots.txt");
-  if(!/Sitemap:\s*https:\/\/mass\.llc\/sitemap\.xml/i.test(robots)) errors.push("robots.txt: canonical sitemap declaration missing");
-  if(/Disallow:\s*\//i.test(robots)) warnings.push("robots.txt: broad Disallow directive detected; verify intentionally");
+for (const cssFile of allFiles.filter(file => file.endsWith(".css"))) {
+  const css = read(cssFile);
+  for (const match of css.matchAll(/(?:url\(\s*["']?([^"')]+)["']?\s*\)|@import\s+(?:url\()?\s*["']([^"')]+)["'])/gi)) {
+    checkReference(cssFile, match[1] || match[2], "CSS reference");
+  }
 }
 
-const htaccessPath=path.join(root,".htaccess");
-if(!fs.existsSync(htaccessPath)) errors.push(".htaccess: missing");
-else{
-  const ht=read(".htaccess");
-  const required=[
-    ["HTTP→HTTPS/canonical host","https://mass.llc%{REQUEST_URI}"],
-    ["/index redirect","RewriteRule ^index/?$ /"],
-    ["/website migration","RewriteRule ^website"],
-    ["extensionless resolver","%{REQUEST_FILENAME}.html -f"]
-  ];
-  for(const [label,needle] of required) if(!ht.includes(needle)) errors.push(`.htaccess: missing ${label}`);
+for (const jsFile of allFiles.filter(file => /\.(?:js|mjs)$/.test(file) && !file.includes("vendor"))) {
+  const js = read(jsFile);
+  for (const match of js.matchAll(/(?:["'`])((?:\.{1,2}\/|\/?assets\/|\/?css\/|\/?js\/)[^"'`\s]+?\.(?:avif|css|gif|jpe?g|js|mjs|mp4|pdf|png|svg|ttf|webm|woff2)(?:[?#][^"'`\s]*)?)(?:["'`])/gi)) {
+    checkReference(jsFile, match[1], "runtime asset");
+  }
 }
 
-console.log(`SEO audit: ${htmlFiles.length} HTML files checked`);
-if(warnings.length){
+for (const file of publicHtml) {
+  const html = read(file);
+  const noindex = /<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
+  if (noindex) continue;
+  const titles = [...html.matchAll(/<title\b[\s\S]*?>([\s\S]*?)<\/title>/gi)];
+  if (titles.length !== 1) errors.push(`${file}: expected exactly one title, found ${titles.length}`);
+  if (titles.length === 1) {
+    const title = normalizedText(titles[0][1]);
+    if (!title) errors.push(`${file}: title is empty`);
+    else if (titleOwners.has(title)) errors.push(`${file}: normalized title duplicates ${titleOwners.get(title)}`);
+    else titleOwners.set(title, file);
+  }
+  const descriptions = metadataValues(html, "description");
+  if (descriptions.length !== 1) errors.push(`${file}: expected exactly one meta description, found ${descriptions.length}`);
+  if (descriptions.length === 1) {
+    const content = /\bcontent=["']([^"']*)["']/i.exec(descriptions[0][0])?.[1] || "";
+    const description = normalizedText(content);
+    if (!description) errors.push(`${file}: meta description is empty`);
+    else if (descriptionOwners.has(description)) errors.push(`${file}: normalized description duplicates ${descriptionOwners.get(description)}`);
+    else descriptionOwners.set(description, file);
+  }
+  const viewports = metadataValues(html, "viewport");
+  if (viewports.length !== 1 || !/\bwidth\s*=\s*device-width\b/i.test(viewports[0]?.[0] || "")) errors.push(`${file}: expected one responsive viewport meta tag`);
+  const canonicals = [...html.matchAll(/<link\s+[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/gi)].map(match => match[1]);
+  if (canonicals.length !== 1) {
+    errors.push(`${file}: expected exactly one canonical, found ${canonicals.length}`);
+  } else {
+    const canonical = canonicals[0];
+    const expected = file === "index.html" ? `${siteOrigin}/` : `${siteOrigin}/${file.slice(0, -5)}`;
+    if (canonical !== expected) errors.push(`${file}: canonical must be ${expected}, found ${canonical}`);
+    if (canonicalOwners.has(canonical)) errors.push(`${file}: duplicate canonical ${canonical} also used by ${canonicalOwners.get(canonical)}`);
+    canonicalOwners.set(canonical, file);
+  }
+  const h1Count = (html.match(/<h1\b/gi) || []).length;
+  if (h1Count !== 1) errors.push(`${file}: expected exactly one H1, found ${h1Count}`);
+  if (/<meta\s+name=["']keywords["']/i.test(html)) warnings.push(`${file}: obsolete keywords metadata remains`);
+  for (const block of html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try { JSON.parse(block[1].trim()); } catch (error) { errors.push(`${file}: invalid JSON-LD (${error.message})`); }
+  }
+}
+
+const sitemapPath = path.join(root, "sitemap.xml");
+const sitemapUrls = new Set();
+if (!fs.existsSync(sitemapPath)) errors.push("sitemap.xml: missing");
+else {
+  const xml = read("sitemap.xml");
+  for (const match of xml.matchAll(/<url>\s*<loc>([^<]+)<\/loc>(?:\s*<lastmod>([^<]+)<\/lastmod>)?\s*<\/url>/gi)) {
+    const url = match[1].trim();
+    sitemapUrls.add(url);
+    if (!url.startsWith(`${siteOrigin}/`)) errors.push(`sitemap.xml: off-domain URL ${url}`);
+    const pathname = new URL(url).pathname;
+    if (/\.html$|\/index$|\/$/.test(pathname) && pathname !== "/") errors.push(`sitemap.xml: noncanonical URL ${url}`);
+    const resolved = resolveLocal("index.html", pathname);
+    if (resolved.error) errors.push(`sitemap.xml: ${url} does not resolve (${resolved.error})`);
+    if (resolved.file && (!rootHtml.includes(resolved.file) || redirectSources.has(resolved.file))) errors.push(`sitemap.xml: ${url} is not an indexable marketing page`);
+  }
+  for (const file of publicHtml) {
+    const html = read(file);
+    if (redirectSources.has(file) || /<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html)) continue;
+    const canonical = file === "index.html" ? `${siteOrigin}/` : `${siteOrigin}/${file.slice(0, -5)}`;
+    if (!sitemapUrls.has(canonical)) errors.push(`sitemap.xml: missing indexable canonical ${canonical}`);
+  }
+}
+
+for (const [file, sources] of inbound) {
+  if (file !== "index.html" && !/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(read(file)) && sources.size === 0) {
+    errors.push(`${file}: public page has no inbound HTML link`);
+  }
+}
+
+const robots = fs.existsSync(path.join(root, "robots.txt")) ? read("robots.txt") : "";
+if (!/Sitemap:\s*https:\/\/mass\.llc\/sitemap\.xml/i.test(robots)) errors.push("robots.txt: canonical sitemap declaration missing");
+if (/^Disallow:\s*\/$/mi.test(robots)) errors.push("robots.txt: site-wide crawl block found");
+
+const manifest = fs.existsSync(path.join(root, "manifest.webmanifest")) ? JSON.parse(read("manifest.webmanifest")) : null;
+if (!manifest) errors.push("manifest.webmanifest: missing");
+else for (const icon of manifest.icons || []) checkReference("manifest.webmanifest", icon.src, "manifest icon");
+
+const htaccess = fs.existsSync(path.join(root, ".htaccess")) ? read(".htaccess") : "";
+for (const [label, needle] of [
+  ["canonical host redirect", "https://mass.llc%{REQUEST_URI}"],
+  ["AIMEE migration", "^aimee(?:\\.html)?/?$ /mims"],
+  ["extensionless resolver", "%{REQUEST_FILENAME}.html -f"],
+  ["reader exception", "reader.html"],
+]) if (!htaccess.includes(needle)) errors.push(`.htaccess: missing ${label}`);
+
+for (const script of allFiles.filter(file => /\.(?:js|mjs)$/.test(file))) {
+  const syntax = spawnSync(process.execPath, ["--check", path.join(root, script)], { encoding: "utf8" });
+  if (syntax.error || syntax.status !== 0) errors.push(`${script}: JavaScript syntax check failed${syntax.stderr ? ` (${syntax.stderr.trim()})` : ""}`);
+}
+
+const indexableHtml = publicHtml.filter(file => !/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(read(file)));
+console.log(`SEO audit: ${indexableHtml.length} indexable routes, ${publicHtml.length} root-page candidates, ${allHtml.length} HTML documents, ${allFiles.length} deployable files checked.`);
+if (warnings.length) {
   console.log("\nWarnings:");
-  for(const warning of warnings) console.log(`- ${warning}`);
+  warnings.forEach(warning => console.log(`- ${warning}`));
 }
-if(errors.length){
+if (errors.length) {
   console.error("\nErrors:");
-  for(const error of errors) console.error(`- ${error}`);
-  process.exitCode=1;
-}else{
-  console.log("\nPASS: no blocking SEO validation errors.");
+  errors.forEach(error => console.error(`- ${error}`));
+  process.exitCode = 1;
+} else {
+  console.log("\nPASS: metadata, internal references, routes, sitemap, robots, manifest, and public-page reachability validated.");
 }
