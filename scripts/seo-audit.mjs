@@ -255,6 +255,95 @@ for (const script of allFiles.filter(file => /\.(?:js|mjs)$/.test(file))) {
   if (syntax.error || syntax.status !== 0) errors.push(`${script}: JavaScript syntax check failed${syntax.stderr ? ` (${syntax.stderr.trim()})` : ""}`);
 }
 
+
+// SEO hardening invariants: source-grounded structured data, social metadata, and AI directory checks.
+function attribute(tag, name) {
+  const match = new RegExp(String.raw`\s${name}\s*=\s*(["'])([\s\S]*?)\1`, "i").exec(tag);
+  return match?.[2] || "";
+}
+function metaContents(html, key) {
+  return [...html.matchAll(/<meta\b[^>]*>/gi)]
+    .filter(match => [attribute(match[0], "name").toLowerCase(), attribute(match[0], "property").toLowerCase()].includes(key.toLowerCase()))
+    .map(match => attribute(match[0], "content"));
+}
+function flattenJsonLd(value) {
+  if (Array.isArray(value)) return value.flatMap(flattenJsonLd);
+  if (!value || typeof value !== "object") return [];
+  return [value, ...flattenJsonLd(value["@graph"] || [])];
+}
+function normalizedPhone(value) { return String(value || "").replace(/[^0-9+]/g, ""); }
+function localCanonical(value) {
+  try {
+    const parsed = new URL(value);
+    if (parsed.origin !== siteOrigin) return null;
+    return `${siteOrigin}${parsed.pathname === "/" ? "/" : parsed.pathname.replace(/\/$/, "")}`;
+  } catch { return null; }
+}
+const socialMeta = ["og:title", "og:description", "og:url", "og:image", "og:site_name", "twitter:card", "twitter:title", "twitter:description", "twitter:image"];
+for (const file of allHtml) {
+  const seen = new Set();
+  for (const match of read(file).matchAll(/<meta\b[^>]*>/gi)) {
+    for (const key of [attribute(match[0], "name"), attribute(match[0], "property")].filter(Boolean).map(value => value.toLowerCase())) {
+      if (seen.has(key)) errors.push(`${file}: duplicate meta ${key}`);
+      seen.add(key);
+    }
+  }
+}
+const pageSchemaTypes = new Set(["WebPage", "AboutPage", "ContactPage", "CollectionPage", "Article", "BlogPosting", "Service", "Product", "FAQPage"]);
+const validOrganisationEmails = new Set(["info@mass.llc"]);
+const validOrganisationPhones = new Set(["+15404887038", "+917483509091"]);
+for (const file of publicHtml) {
+  const html = read(file);
+  const expected = file === "index.html" ? `${siteOrigin}/` : `${siteOrigin}/${file.slice(0, -5)}`;
+  for (const key of socialMeta) {
+    const values = metaContents(html, key);
+    if (values.length !== 1 || !values[0].trim()) errors.push(`${file}: expected one nonempty ${key} meta tag`);
+  }
+  const ogUrl = metaContents(html, "og:url")[0];
+  if (ogUrl && ogUrl !== expected) errors.push(`${file}: og:url must be ${expected}, found ${ogUrl}`);
+  for (const key of ["og:image", "twitter:image"]) {
+    const value = metaContents(html, key)[0];
+    if (value && isSameOrigin(value)) checkReference(file, value, key);
+  }
+  const nodes = [];
+  for (const block of html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try { nodes.push(...flattenJsonLd(JSON.parse(block[1].trim()))); } catch { /* existing syntax check reports this */ }
+  }
+  if (!nodes.length) errors.push(`${file}: expected at least one JSON-LD object`);
+  for (const node of nodes) {
+    const types = Array.isArray(node["@type"]) ? node["@type"] : [node["@type"]];
+    const isPageNode = types.some(type => pageSchemaTypes.has(type));
+    if (isPageNode && typeof node.url === "string" && node.url !== expected) errors.push(`${file}: page JSON-LD url must be ${expected}, found ${node.url}`);
+    if (isPageNode && typeof node["@id"] === "string" && node["@id"].startsWith(siteOrigin) && !(node["@id"] === expected || node["@id"].startsWith(`${expected}#`))) errors.push(`${file}: page JSON-LD @id must identify its canonical page`);
+    const isOrganisation = types.includes("Organization") || types.includes("ContactPoint");
+    if (isOrganisation && node.email && !validOrganisationEmails.has(String(node.email).toLowerCase())) errors.push(`${file}: schema email is not the approved public contact address`);
+    const phones = Array.isArray(node.telephone) ? node.telephone : node.telephone ? [node.telephone] : [];
+    for (const phone of phones) if (!validOrganisationPhones.has(normalizedPhone(phone))) errors.push(`${file}: schema telephone is not an approved public MASS phone`);
+    for (const key of ["url", "@id", "item"]) {
+      if (typeof node[key] !== "string") continue;
+      const canonical = localCanonical(node[key]);
+      if (canonical) { const schemaFile = canonical === siteOrigin + "/" ? "index.html" : `${canonical.slice(siteOrigin.length + 1)}.html`; if (!rootHtml.includes(schemaFile)) errors.push(`${file}: JSON-LD ${key} points to a missing local canonical page ${node[key]}`); }
+      if (node[key].startsWith("http://mass.llc") || node[key].startsWith("https://www.mass.llc")) errors.push(`${file}: JSON-LD ${key} must use the HTTPS non-www origin`);
+    }
+  }
+}
+
+const llmsPath = path.join(root, "llms.txt");
+if (!fs.existsSync(llmsPath)) errors.push("llms.txt: missing");
+else {
+  const llms = read("llms.txt");
+  if (/contact@mass\.llc/i.test(llms)) errors.push("llms.txt: retired public contact email remains");
+  const links = [...llms.matchAll(/https:\/\/mass\.llc(?:\/[A-Za-z0-9-]*)?/g)].map(match => match[0]);
+  for (const url of links) if (!sitemapUrls.has(url)) errors.push(`llms.txt: link is not a current sitemap canonical: ${url}`);
+  for (const url of [`${siteOrigin}/ai-automation`, `${siteOrigin}/web-development`, `${siteOrigin}/software-development`, `${siteOrigin}/agentic-ai`, `${siteOrigin}/mims`, `${siteOrigin}/campus`, `${siteOrigin}/contact`]) if (!links.includes(url)) errors.push(`llms.txt: required factual directory link missing: ${url}`);
+}
+
+for (const [label, needle] of [
+  ["PDF/MJS noindex policy", '<FilesMatch "\\.(?:pdf|mjs)$">'],
+  ["PDF/MJS X-Robots policy", 'Header always set X-Robots-Tag "noindex, nofollow"'],
+  ["reader noindex policy", '<Files "reader.html">'],
+]) if (!htaccess.includes(needle)) errors.push(`.htaccess: missing ${label}`);
+
 const indexableHtml = publicHtml.filter(file => !/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(read(file)));
 console.log(`SEO audit: ${indexableHtml.length} indexable routes, ${publicHtml.length} root-page candidates, ${allHtml.length} HTML documents, ${allFiles.length} deployable files checked.`);
 if (warnings.length) {

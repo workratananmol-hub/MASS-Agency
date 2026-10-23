@@ -280,7 +280,6 @@
     media.add('(min-width: 700px) and (min-height: 500px) and (prefers-reduced-motion: no-preference)',() => {
       const hero = $('#top');
       const motion = $('.dashboard-motion');
-      const pageHeader = $('.site-header');
       const reveal = document.createElement('div');reveal.className='hero-reveal';reveal.setAttribute('aria-hidden','true');reveal.inert=true;
       const challengeClone = $('#challenge').cloneNode(true);
       challengeClone.removeAttribute('id');
@@ -304,13 +303,11 @@
       });
       story.to(motion,{y:0,scale:1,rotationX:0,rotationY:0,rotation:0,duration:.85,ease:'power3.out'},0)
         .to($('.hero-intro'),{y:-140,autoAlpha:0,duration:.5,ease:'power2.out'},0)
-        .to(pageHeader,{autoAlpha:0,duration:.18},.02)
         .to($('.dashboard-frame'),{borderRadius:0,duration:.3},.5)
         .to(hold,{progress:1,duration:1},.85)
         .to(reveal,{autoAlpha:1,duration:.12},1.85)
         .to(motion,{rotationX:75,yPercent:-85,y:-100,scale:.86,duration:.65,ease:'power2.out'},1.85)
-        .to(motion,{autoAlpha:0,duration:.12},2.38)
-        .to(pageHeader,{autoAlpha:1,duration:.22},2.12);
+        .to(motion,{autoAlpha:0,duration:.12},2.38);
       document.fonts.ready.then(() => ScrollTrigger.refresh());
       return () => {
         story=null;reveal.remove();document.body.classList.remove('scroll-tour-active');

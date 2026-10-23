@@ -2,6 +2,11 @@
 (()=>{
   const container=document.getElementById("footer-wave");
   if(!container||container.dataset.ready)return;
+  if(window.MASSFooterWave){window.MASSFooterWave.init();return}
+  const loader=document.querySelector('script[src^="/js/footer-wave-loader.js"]');
+  if(loader){loader.addEventListener("load",()=>window.MASSFooterWave?.init(),{once:true});return}
+  const script=document.createElement("script");
+  script.src="/js/footer-wave-loader.js";script.async=true;script.onload=()=>window.MASSFooterWave?.init();document.head.append(script);return;
   container.dataset.ready="true";
   const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lowEnd=(navigator.hardwareConcurrency||8)<=4;

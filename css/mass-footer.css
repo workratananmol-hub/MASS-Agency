@@ -132,7 +132,7 @@
   font-size: 11px;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, .42);
+  color: rgba(255, 255, 255, .54);
   margin: 0 0 22px;
 }
 
@@ -251,7 +251,7 @@
 .mass-footer .footer__bottom p {
   font-family: "MASS Footer Mono", monospace;
   font-size: 11px;
-  color: rgba(255, 255, 255, .42);
+  color: rgba(255, 255, 255, .54);
   margin: 0;
 }
 

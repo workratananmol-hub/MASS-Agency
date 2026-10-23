@@ -48,3 +48,7 @@
 
 /* Keep the complete product and MASS navigation reachable on small screens. */
 .site-menu{bottom:0;overflow-y:auto;overscroll-behavior:contain}
+
+/* One measured source of truth keeps the persistent header, menu and anchors aligned. */
+:root{--mims-header-height:78px}.site-header{height:var(--mims-header-height)}.site-menu{top:var(--mims-header-height)}.hero{padding-top:var(--mims-header-height)}
+@media(max-width:600px){:root{--mims-header-height:66px}.site-header{height:var(--mims-header-height)}.site-menu{top:var(--mims-header-height)}.hero{padding-top:var(--mims-header-height)}}

@@ -31,6 +31,9 @@ RewriteRule ^services(?:\.html)?/?$ / [R=301,L,NC]
 RewriteRule ^insight-roi-ai-automation(?:\.html)?/?$ /ai-automation-roi [R=301,L,NC]
 RewriteRule ^blog-posts/ai-document-processing-automation(?:\.html)?/?$ /ai-automation [R=301,L,NC]
 RewriteRule ^blog-posts/react-vs-nextjs-saas(?:\.html)?/?$ /software-development [R=301,L,NC]
+# The former plural blog endpoint now has a current equivalent. Keep every
+# spelling in one hop so old external links do not terminate at the 404 page.
+RewriteRule ^blogs(?:\.html)?/?$ /blog [R=301,L,NC]
 
 # Redirect the homepage aliases directly to the root.
 RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
