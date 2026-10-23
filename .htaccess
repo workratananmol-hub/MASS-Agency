@@ -1,4 +1,4 @@
-Options -MultiViews
+Options -MultiViews -Indexes
 DirectoryIndex index.html
 
 RewriteEngine On
@@ -7,26 +7,54 @@ RewriteEngine On
 ErrorDocument 404 /404.html
 ErrorDocument 500 /500.html
 
-# Do not apply public-URL rewrites to an error subrequest, and do not
-# 301 the error files to extensionless URLs (that would risk a 200).
+# Keep error subrequests and the error documents out of public URL rewrites.
 RewriteCond %{ENV:REDIRECT_STATUS} ^[45][0-9][0-9]$
 RewriteRule ^ - [L]
 RewriteRule ^(404|500)\.html$ - [L]
+
+# Do not expose repository metadata or dotfiles. ACME and other intentional
+# verification files remain available under /.well-known/.
+RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
 
 # Use the secure, canonical domain.
 RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} !^mass\.llc$ [NC]
 RewriteRule ^ https://mass.llc%{REQUEST_URI} [R=301,L]
 
-# Redirect direct .html requests to the public extensionless URL.
-# The explicit index rule keeps the homepage at the root URL.
+# Preserve SEO equity for renamed and retired public routes. Keep these before
+# the generic .html and trailing-slash rules so every AIMEE variation reaches
+# /mims in one hop.
+RewriteRule ^aimee(?:\.html)?/?$ /mims [R=301,L,NC]
+RewriteRule ^website(?:\.html)?/?$ /web-development [R=301,L,NC]
+RewriteRule ^service-web-mobile(?:\.html)?/?$ /web-development [R=301,L,NC]
+RewriteRule ^services(?:\.html)?/?$ / [R=301,L,NC]
+RewriteRule ^insight-roi-ai-automation(?:\.html)?/?$ /ai-automation-roi [R=301,L,NC]
+RewriteRule ^blog-posts/ai-document-processing-automation(?:\.html)?/?$ /ai-automation [R=301,L,NC]
+RewriteRule ^blog-posts/react-vs-nextjs-saas(?:\.html)?/?$ /software-development [R=301,L,NC]
+# The former plural blog endpoint now has a current equivalent. Keep every
+# spelling in one hop so old external links do not terminate at the 404 page.
+RewriteRule ^blogs(?:\.html)?/?$ /blog [R=301,L,NC]
+
+# Redirect the homepage aliases directly to the root.
 RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
 RewriteRule ^index\.html$ / [R=301,L]
+RewriteCond %{THE_REQUEST} \s/+index(?:[/?\s]) [NC]
+RewriteRule ^index/?$ / [R=301,L]
 
-RewriteCond %{THE_REQUEST} \s/+(.+?)\.html[\s?] [NC]
-RewriteRule ^(.+)\.html$ /$1 [R=301,L,NE]
+# Root marketing pages use extensionless URLs. Limit this rule to root files;
+# MIMS' reader.html is a technical asset and must retain its literal filename.
+RewriteCond %{THE_REQUEST} \s/+([A-Za-z0-9-]+)\.html[\s?] [NC]
+RewriteRule ^([A-Za-z0-9-]+)\.html$ /$1 [R=301,L,NE]
 
-# Resolve extensionless public URLs to the corresponding HTML file.
+# A trailing slash on an extensionless marketing route is non-canonical.
+# Existing directories and files (including /assets/.../reader.html) are left
+# untouched by the filesystem guards.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.+)/$ /$1 [R=301,L,NE]
+
+# Resolve extensionless public URLs to their HTML file.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.html -f
@@ -38,9 +66,44 @@ RewriteRule ^(.+?)/?$ $1.html [L]
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
   Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Supporting PDFs and the local PDF viewer are useful to visitors, but are
+  # not standalone search landing pages.
+  <FilesMatch "\.(?:pdf|mjs)$">
+    Header always set X-Robots-Tag "noindex, nofollow"
+  </FilesMatch>
+  <Files "reader.html">
+    Header always set X-Robots-Tag "noindex, nofollow"
+  </Files>
 </IfModule>
 
-# Compress text-based assets when mod_deflate is available.
+# Compress text-based assets when these optional Apache modules are available.
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# Ensure Hostinger serves newer local asset types with their intended MIME type.
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType application/javascript .js .mjs
+  AddType application/pdf .pdf
+  AddType video/mp4 .mp4
+</IfModule>
+
+# Cache versioned/static assets without caching HTML aggressively.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/avif "access plus 6 months"
+  ExpiresByType image/webp "access plus 6 months"
+  ExpiresByType image/png "access plus 6 months"
+  ExpiresByType image/jpeg "access plus 6 months"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType video/mp4 "access plus 6 months"
+  ExpiresByType application/pdf "access plus 1 month"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
 </IfModule>
