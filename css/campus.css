@@ -11,3 +11,6 @@
   .campus-mobile-menu nav{position:absolute;top:74px;left:0;right:0;z-index:100;display:grid;gap:0;background:#0a0a0a;padding:16px 6%;max-height:calc(100dvh - 74px);overflow:auto;border-bottom:1px solid #535645}
   .campus-mobile-menu nav>a{display:block!important;font-size:24px;padding:10px 0;border-bottom:1px solid #ffffff25}.campus-mobile-menu+ .logo{margin-right:auto}.footer-links{gap:16px 22px}
 }
+
+/* Keep the MASS wordmark within the reading column on narrow phones. */
+@media(max-width:360px){.mass-mark{font-size:clamp(88px,30vw,108px)}}
