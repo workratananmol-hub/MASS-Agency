@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://mass.llc/</loc><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://mass.llc/</loc><lastmod>2026-10-23</lastmod></url>
   <url><loc>https://mass.llc/web-development</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/ai-automation</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/agentic-ai</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/software-development</loc><lastmod>2026-09-26</lastmod></url>
-  <url><loc>https://mass.llc/about</loc><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://mass.llc/about</loc><lastmod>2026-10-23</lastmod></url>
   <url><loc>https://mass.llc/contact</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/pricing</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/usa</loc><lastmod>2026-09-26</lastmod></url>
-  <url><loc>https://mass.llc/india</loc><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://mass.llc/india</loc><lastmod>2026-10-23</lastmod></url>
   <url><loc>https://mass.llc/uae</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/blog</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/inventrics</loc><lastmod>2026-09-05</lastmod></url>
@@ -29,4 +29,5 @@
   <url><loc>https://mass.llc/react-native-vs-flutter-2026</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mass.llc/terms</loc><lastmod>2026-09-07</lastmod></url>
   <url><loc>https://mass.llc/privacy</loc><lastmod>2026-09-07</lastmod></url>
+  <url><loc>https://mass.llc/campus</loc><lastmod>2026-10-23</lastmod></url>
 </urlset>
