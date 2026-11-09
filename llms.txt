@@ -37,6 +37,7 @@
 
 ## Selected work
 
+- [FBEDS](https://mass.llc/fbeds): AI email automation for a UAE hotel-booking team: classifies mail, files contracts, drafts replies, with a human review desk.
 - [Inventrics](https://mass.llc/inventrics): company website, technical SEO, AI-powered features, and customer-engagement automation.
 - [Oakspire Tech](https://mass.llc/oakspire-tech): business website connected to AI-powered workflows.
 - [VastraPvt](https://mass.llc/vastrapvt): e-commerce website work spanning Shopify, WordPress, discovery, performance, SEO, and the path to purchase.
