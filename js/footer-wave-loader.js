@@ -18,13 +18,19 @@
     const canvas=document.createElement("canvas"),context=canvas.getContext("2d"),ratio=Math.min(devicePixelRatio||1,2);
     canvas.dataset.footerFallback="true";canvas.setAttribute("aria-hidden","true");
     let width=0,height=0,phase=0,frame=0,visible=true;
+    /* Same grid, camera and wave as the WebGL surface, projected in 2D so both look identical. */
+    const SEPARATION=110,AMOUNTX=60,AMOUNTY=30,CAMERA_Y=260,CAMERA_Z=1100,FOCAL=1/Math.tan(78*Math.PI/360);
     const draw=()=>{
       if(!width||!height)return;
-      context.setTransform(ratio,0,0,ratio,0,0);context.clearRect(0,0,width,height);context.fillStyle="rgba(217,217,217,.7)";
-      const rows=17;
-      for(let row=0;row<rows;row++){
-        const progress=row/(rows-1),depth=.18+progress*.82,spacing=12+depth*18,radius=.55+depth*.85,y=height*(.08+progress*.88),amplitude=4+depth*17,offset=Math.sin(row*.74)*spacing*.45;
-        for(let x=-spacing*2;x<width+spacing*2;x+=spacing){const wave=Math.sin(x*.018+row*.42+phase)*amplitude+Math.sin(row*.55+phase*.6)*amplitude*.3;context.beginPath();context.arc(x+offset,y+wave,radius,0,Math.PI*2);context.fill()}
+      context.setTransform(ratio,0,0,ratio,0,0);context.clearRect(0,0,width,height);context.fillStyle="rgba(217,217,217,.85)";
+      const scale=height/2*FOCAL,cx=width/2,cy=height/2;
+      for(let ix=0;ix<AMOUNTX;ix++)for(let iy=0;iy<AMOUNTY;iy++){
+        const depth=CAMERA_Z-(iy*SEPARATION-AMOUNTY*SEPARATION/2);
+        if(depth<1)continue;
+        const x=ix*SEPARATION-AMOUNTX*SEPARATION/2,y=Math.sin((ix+phase)*.3)*50+Math.sin((iy+phase)*.5)*50;
+        const sx=cx+x*scale/depth,sy=cy-(y-CAMERA_Y)*scale/depth,size=Math.max(6*cy/depth,1);
+        if(sx<-size||sx>width+size||sy<-size||sy>height+size)continue;
+        context.fillRect(sx-size/2,sy-size/2,size,size);
       }
     };
     const render=()=>{
@@ -34,7 +40,7 @@
       draw();
     };
     /* The fallback moves too, so the footer never looks frozen when WebGL is unavailable. */
-    const animate=()=>{frame=0;if(!canvas.isConnected||!visible||document.hidden)return;phase+=.035;draw();frame=requestAnimationFrame(animate)};
+    const animate=()=>{frame=0;if(!canvas.isConnected||!visible||document.hidden)return;phase+=.07;draw();frame=requestAnimationFrame(animate)};
     const start=()=>{if(!frame&&visible&&!document.hidden&&canvas.isConnected)frame=requestAnimationFrame(animate)};
     container.append(canvas);container.dataset.footerFallback="true";render();
     if("ResizeObserver" in window)new ResizeObserver(render).observe(container);else addEventListener("resize",render,{passive:true});
