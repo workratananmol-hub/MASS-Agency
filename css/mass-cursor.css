@@ -1,0 +1,36 @@
+/* Shared MASS precision cursor. It is enabled only after the component runs. */
+.mass-cursor-dot,
+.mass-cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  transition: opacity .16s ease, width .18s ease, height .18s ease, margin .18s ease, border-color .16s ease, background-color .16s ease;
+  contain: layout style paint;
+}
+.mass-cursor-dot { width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: #cfff04; }
+.mass-cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14px; border: 1px solid #cfff04; border-radius: 50%; }
+.mass-cursor-dot.is-visible,
+.mass-cursor-ring.is-visible { opacity: 1; }
+.mass-cursor-dot.is-ink { background: #0a0a0a; }
+.mass-cursor-ring.is-ink { border-color: #0a0a0a; }
+.mass-cursor-ring.is-active { width: 42px; height: 42px; margin: -21px 0 0 -21px; border-width: 1.5px; }
+.mass-cursor-ring.is-pressed { width: 20px; height: 20px; margin: -10px 0 0 -10px; }
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  html.mass-cursor-enabled,
+  html.mass-cursor-enabled a,
+  html.mass-cursor-enabled button,
+  html.mass-cursor-enabled [role="button"],
+  html.mass-cursor-enabled summary { cursor: none; }
+  html.mass-cursor-enabled input,
+  html.mass-cursor-enabled textarea,
+  html.mass-cursor-enabled select,
+  html.mass-cursor-enabled [contenteditable="true"] { cursor: text; }
+}
+@media (hover:none), (pointer:coarse), (prefers-reduced-motion:reduce) {
+  .mass-cursor-dot,
+  .mass-cursor-ring { display: none !important; }
+}

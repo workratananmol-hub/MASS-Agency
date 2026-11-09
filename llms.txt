@@ -1,0 +1,53 @@
+# MASS
+
+> Canonical site: https://mass.llc/
+> Contact: [info@mass.llc](mailto:info@mass.llc) | United States: +1 540 488 7038 | India: +91 7483509091
+
+[MASS](https://mass.llc/) is a Herndon, Virginia-based studio that builds AI automation, websites, custom software, AI agents, and education-focused product experiences. This is a concise, human-readable directory of the public canonical pages on mass.llc. It supplements ordinary web crawling and does not control robots access, indexing, training, ranking, or citations. For current details, use the linked canonical page and visible site content.
+
+## Services
+
+- [AI automation](https://mass.llc/ai-automation): workflow automation for email, documents, CRM, support, reporting, and operations, with human review and production guardrails.
+- [Web development](https://mass.llc/web-development): custom business websites and web applications.
+- [Custom software development](https://mass.llc/software-development): web apps, SaaS products, internal tools, portals, APIs, and AI-enabled software.
+- [AI agent development](https://mass.llc/agentic-ai): agentic systems designed to act, collaborate, and deliver outcomes.
+- [Pricing and engagement guide](https://mass.llc/pricing): how MASS scopes and prices AI automation, web development, and custom software work.
+
+## Products and programmes
+
+- [MIMS](https://mass.llc/mims): a teaching system in development for visual explanations, editable teaching materials, and assessments using curriculum resources built into the system. The first planned release is CBSE Classes 9–10 Mathematics in English, including Class 10 Basic and Standard. Broader subjects and grades are product vision, not current availability.
+- [Campus AI sessions](https://mass.llc/campus): seminars and hands-on masterclasses for colleges, education centres, and E-cells on AI automation, product building, and selling useful solutions.
+- [Bellwether PA](https://mass.llc/bellwether-pa): operations product in development.
+- [Joyquill](https://mass.llc/joyquill): KDP book pipeline in development.
+- [Instagram AI Avatar](https://mass.llc/instagram-ai-avatar): internal MASS venture.
+
+## Markets
+
+- [United States](https://mass.llc/usa): AI automation, web development, custom software, and AI agent development for U.S. organizations.
+- [India](https://mass.llc/india): remote, founder-led delivery for companies in India.
+- [United Arab Emirates](https://mass.llc/uae): remote delivery for UAE companies.
+
+## Company and policies
+
+- [About MASS](https://mass.llc/about)
+- [Contact MASS](https://mass.llc/contact)
+- [Insights](https://mass.llc/blog)
+- [Website terms](https://mass.llc/terms)
+- [Privacy policy](https://mass.llc/privacy)
+
+## Selected work
+
+- [Inventrics](https://mass.llc/inventrics): company website, technical SEO, AI-powered features, and customer-engagement automation.
+- [Oakspire Tech](https://mass.llc/oakspire-tech): business website connected to AI-powered workflows.
+- [VastraPvt](https://mass.llc/vastrapvt): e-commerce website work spanning Shopify, WordPress, discovery, performance, SEO, and the path to purchase.
+- [LearnBay](https://mass.llc/learnbay): education-platform redesign for comparing and acting on AI, data, and full-stack programme options.
+
+## Insights
+
+- [How to calculate the ROI of AI automation before you build](https://mass.llc/ai-automation-roi)
+- [What an AI agent actually does (and does not do) for your business](https://mass.llc/ai-agent-business)
+- [How to design an AI support agent with escalation and evaluation](https://mass.llc/ai-support-agent-80-percent)
+- [The five business processes to automate first](https://mass.llc/business-processes-automate-first)
+- [Automating candidate screening in U.S. staffing](https://mass.llc/automating-candidate-screening-us-staffing)
+- [What the first 90 days of a SaaS MVP should prove](https://mass.llc/saas-mvp-failure)
+- [React Native vs Flutter in 2026: how to choose](https://mass.llc/react-native-vs-flutter-2026)

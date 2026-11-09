@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">A right triangle starts at the observer's eye</title>
+  <desc id="desc">The amber line of sight runs from an observer's eye to the top of a vertical tower. A teal horizontal eye-level line meets the brick vertical height at a right angle. Ground is below the eye-level line. The triangle uses the height above eye level, not the full tower height.</desc>
+  <rect width="1280" height="720" fill="#fafaf7"/>
+  <g font-family="Arial,sans-serif" fill="#172823">
+    <text x="56" y="51" font-size="16" font-weight="700" letter-spacing="2">MIMS / REVISED EXPLANATORY DIAGRAM</text>
+    <text x="56" y="108" font-size="43" font-weight="700" letter-spacing="-1.5">Start at the observer’s eye.</text>
+    <text x="56" y="147" font-size="23" fill="#52615b">A sight line, a horizontal reference and a vertical height form a right triangle.</text>
+    <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M75 535H855" stroke="#4c5952" stroke-width="3"/>
+      <path d="M800 215V535" stroke="#ad4938" stroke-width="5"/>
+      <path d="M150 440H800" stroke="#176a68" stroke-width="3.5"/>
+      <path d="M150 440 800 215" stroke="#a56713" stroke-width="4.5"/>
+      <path d="M780 440V420H800" stroke="#52615b" stroke-width="2"/>
+      <path d="M205 440A55 55 0 0 0 202 422" stroke="#172823" stroke-width="2"/>
+      <path d="M147 467V507M147 480 128 492M147 480 166 492M147 507 133 535M147 507 161 535" stroke="#52615b" stroke-width="3"/>
+      <circle cx="147" cy="453" r="13" stroke="#52615b" stroke-width="2"/>
+      <circle cx="150" cy="440" r="5" fill="#172823" stroke="#fafaf7" stroke-width="2"/>
+    </g>
+    <text x="224" y="430" font-size="27" font-style="italic">θ</text>
+    <text x="375" y="322" font-size="25" font-weight="700" fill="#a56713" transform="rotate(-19.1 375 322)">Line of sight</text>
+    <text x="376" y="475" font-size="22" fill="#176a68">Horizontal at eye level</text>
+    <text x="96" y="579" font-size="20">Observer</text>
+    <text x="609" y="570" font-size="20" fill="#52615b">Level ground</text>
+    <text x="818" y="511" font-size="18" fill="#ad4938">Tower</text>
+    <path d="M921 205V582" stroke="#d9dfd7"/>
+    <rect x="968" y="225" width="36" height="4" rx="2" fill="#a56713"/>
+    <text x="968" y="266" font-size="23" font-weight="700">Line of sight</text>
+    <text x="968" y="297" font-size="20" fill="#52615b">The hypotenuse</text>
+    <rect x="968" y="347" width="36" height="4" rx="2" fill="#ad4938"/>
+    <text x="968" y="388" font-size="23" font-weight="700">Vertical height</text>
+    <text x="968" y="419" font-size="20" fill="#52615b">Above eye level</text>
+    <rect x="968" y="469" width="36" height="4" rx="2" fill="#176a68"/>
+    <text x="968" y="510" font-size="23" font-weight="700">Horizontal</text>
+    <text x="968" y="541" font-size="20" fill="#52615b">At the observer’s eye</text>
+    <path d="M56 620H1224" stroke="#d9dfd7"/>
+    <text x="56" y="660" font-size="21" fill="#52615b">Use the height above eye level for this triangle — not the tower’s full height.</text>
+    <text x="56" y="692" font-size="16" fill="#69776e">Schematic; not to scale. θ is the angle of elevation from the horizontal.</text>
+  </g>
+</svg>

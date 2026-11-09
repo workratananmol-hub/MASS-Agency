@@ -1,5 +1,19 @@
+# Search and user-directed retrieval crawlers. These explicit rules make the
+# public discovery policy clear for services that use their own user-agent.
+# Googlebot and Bingbot are also allowed by the default group below.
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# Model-training crawlers are intentionally governed by the same public
+# discovery policy below. This file does not claim that any crawler will index,
+# train on, cite, or surface the site; each crawler applies its own policies.
 User-agent: *
 Allow: /
-Disallow: /ai-trading-bot
 
 Sitemap: https://mass.llc/sitemap.xml

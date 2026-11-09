@@ -1,2 +1,14 @@
-# Auto detect text files and perform LF normalization
+# Normalize authored text; preserve binary and upstream distribution bytes.
 * text=auto
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.woff2 binary
+*.ttf binary
+*.pfb binary
+*.mp4 binary
+assets/mims/vendor/** -whitespace
+assets/mims/fonts/*OFL.txt -whitespace

@@ -1,64 +1,13 @@
 /* Canonical-domain metadata */
 (()=>{
   const canonicalDomain="https://mass.llc";
-  const cleanPath=(location.pathname==="/"||/\/index\.html$/i.test(location.pathname))?"/":location.pathname.replace(/\.html$/i,"");
+  const normalizedPath=location.pathname.replace(/\/+$/,"")||"/";
+  const cleanPath=(normalizedPath==="/"||/\/index(?:\.html)?$/i.test(normalizedPath))?"/":normalizedPath.replace(/\.html$/i,"");
   const canonicalUrl=canonicalDomain+cleanPath;
   const canonical=document.querySelector('link[rel="canonical"]');
   if(canonical)canonical.href=canonicalUrl;
   const ogUrl=document.querySelector('meta[property="og:url"]');
   if(ogUrl)ogUrl.content=canonicalUrl;
-})();
-
-/* MASS global navigation */
-(()=>{
-  const header=document.querySelector(".site-header"),trigger=header?.querySelector(".menu"),logo=header?.querySelector(".logo"),cta=header?.querySelector(".nav-cta");
-  if(!header||!trigger||!logo||document.querySelector(".mass-menu-overlay"))return;
-  const current=(location.pathname==="/"?"/":location.pathname.replace(/\/$/,"").replace(/\.html$/i,"")).toLowerCase();
-  const primaryNav=header.querySelector(".nav");
-  if(primaryNav){
-    [["/about","About"],["/blog","Blog"]].forEach(([href,label])=>{
-      if(!primaryNav.querySelector(`a[href="${href}"]`)){const link=document.createElement("a");link.href=href;link.textContent=label;primaryNav.append(link)}
-    });
-    primaryNav.querySelectorAll("a").forEach(link=>{if(link.getAttribute("href")===current)link.setAttribute("aria-current","page")});
-  }
-  trigger.classList.add("mass-menu-trigger");
-  trigger.innerHTML='<span class="mass-menu-icon" aria-hidden="true"><i></i><i></i></span><span class="mass-menu-trigger-label">Menu</span>';
-  trigger.setAttribute("aria-label","Open navigation");
-  trigger.setAttribute("aria-controls","mass-menu-overlay");
-  logo.setAttribute("aria-label","MASS home");
-  if(cta){cta.href="/contact";cta.innerHTML='Start a project <span aria-hidden="true">↗</span>'}
-  const links=[
-    ["/","Home","01"],["/about","About","02"],["/website","Web Services","03"],
-    ["/agentic-ai","AI Services","04"],["/contact","Contact","05"],
-    ["/blog","Blog","06"]
-  ];
-  const art=[
-    '<circle cx="105" cy="105" r="70"/><circle cx="105" cy="105" r="38"/><path d="M105 18v174M18 105h174"/>',
-    '<path d="M28 64h150v112H28zM48 86h110M48 112h72M48 138h92"/><path d="m142 30 36 34-36 34"/>',
-    '<path d="M105 25 174 65v80l-69 40-69-40V65zM105 105l69-40M105 105 36 65M105 105 36 65M105 105v80"/><circle cx="105" cy="105" r="18"/>',
-    '<path d="M42 30h126v150H42zM62 58h86M62 84h86M62 110h58M62 136h72"/><circle cx="164" cy="158" r="24"/>',
-    '<path d="M24 105h162M105 24v162"/><circle cx="105" cy="105" r="58"/><circle cx="105" cy="105" r="12"/><path d="m148 62 38-38M166 24h20v20"/>',
-    '<path d="M38 30h116l18 18v132H38zM154 30v20h18M60 72h90M60 98h90M60 124h64M60 150h76"/><circle cx="155" cy="146" r="23"/>'
-  ];
-  const overlay=document.createElement("div");
-  overlay.id="mass-menu-overlay";overlay.className="mass-menu-overlay";overlay.hidden=true;overlay.setAttribute("aria-hidden","true");
-  overlay.innerHTML=`<button class="mass-menu-backdrop" type="button" aria-label="Close navigation"></button>
-    <div class="mass-menu-layer mass-menu-layer--one" aria-hidden="true"></div><div class="mass-menu-layer mass-menu-layer--two" aria-hidden="true"></div>
-    <div class="mass-menu-panel"><div class="mass-menu-layout">
-      <nav class="mass-menu-nav" aria-label="Full navigation"><p class="mass-menu-eyebrow">Navigate / MASS</p><ol class="mass-menu-list">${links.map(([href,label,num],i)=>`<li><a class="mass-menu-link" data-shape="${i}" href="${href}"${((href===current)||(href==="index.html"&&current===""))?' aria-current="page"':''}><span class="mass-menu-number">${num}</span><span>${label}</span><span class="mass-menu-arrow" aria-hidden="true">↗</span></a></li>`).join("")}</ol></nav>
-      <aside class="mass-menu-visual" aria-hidden="true"><p>Digital systems<br>built to move.</p><div class="mass-menu-arts">${art.map((paths,i)=>`<svg class="mass-menu-art${i===0?' is-active':''}" data-art="${i}" viewBox="0 0 210 210" fill="none">${paths}</svg>`).join("")}</div><span>Herndon, Virginia · 38.9696° N</span></aside>
-      <div class="mass-menu-meta"><a href="mailto:contact@mass.llc">contact@mass.llc</a><span>Web development + Agentic AI</span></div>
-    </div></div>`;
-  document.body.appendChild(overlay);
-  const backdrop=overlay.querySelector(".mass-menu-backdrop"),panel=overlay.querySelector(".mass-menu-panel"),layers=[...overlay.querySelectorAll(".mass-menu-layer")],menuLinks=[...overlay.querySelectorAll(".mass-menu-link")],arts=[...overlay.querySelectorAll(".mass-menu-art")];
-  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let open=false,closing=false,lastFocus=null;
-  const setArt=index=>arts.forEach((shape,i)=>shape.classList.toggle("is-active",i===index));
-  menuLinks.forEach((link,i)=>{link.addEventListener("pointerenter",()=>setArt(i));link.addEventListener("focus",()=>setArt(i));link.addEventListener("click",event=>{const destination=new URL(link.href,location.href),samePage=destination.pathname===location.pathname&&destination.hash;if(!samePage){closeMenu(false);return}event.preventDefault();closeMenu(false);const moveToSection=()=>{const target=document.querySelector(destination.hash);if(!target)return;history.pushState(null,"",destination.hash);target.scrollIntoView({behavior:reduced?"auto":"smooth",block:"start"})};reduced?moveToSection():setTimeout(moveToSection,680)})});
-  const openMenu=()=>{if(open||closing)return;open=true;lastFocus=document.activeElement;overlay.hidden=false;overlay.setAttribute("aria-hidden","false");document.body.classList.add("mass-menu-open");header.classList.add("mass-menu-header-open");trigger.classList.add("is-open");trigger.setAttribute("aria-expanded","true");trigger.setAttribute("aria-label","Close navigation");requestAnimationFrame(()=>{overlay.classList.add("is-open");if(reduced)menuLinks[0]?.focus();else setTimeout(()=>menuLinks[0]?.focus(),620)})};
-  const closeMenu=(restore=true)=>{if(!open||closing)return;closing=true;open=false;overlay.classList.remove("is-open");trigger.classList.remove("is-open");trigger.setAttribute("aria-expanded","false");trigger.setAttribute("aria-label","Open navigation");const finish=()=>{overlay.hidden=true;overlay.setAttribute("aria-hidden","true");document.body.classList.remove("mass-menu-open");header.classList.remove("mass-menu-header-open");closing=false;if(restore)lastFocus?.focus()};reduced?finish():setTimeout(finish,650)};
-  trigger.addEventListener("click",()=>open?closeMenu():openMenu());backdrop.addEventListener("click",()=>closeMenu());
-  document.addEventListener("keydown",event=>{if(!open)return;if(event.key==="Escape"){event.preventDefault();closeMenu();return}if(event.key!=="Tab")return;const focusable=[trigger,...menuLinks,cta].filter(Boolean),first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}});
 })();
 
 /* Homepage hero-to-work scroll stack */
@@ -109,15 +58,26 @@
   mm.add({desktop:"(min-width: 801px)",reduce:"(prefers-reduced-motion: reduce)"},context=>{
     const {desktop,reduce}=context.conditions;
     if(!desktop||reduce)return;
+    scrollArea.classList.add("is-enhanced");
+    const stage=section.querySelector(".product-stage"),list=section.querySelector(".product-list");
+    const fitActiveItem=index=>{
+      const item=items[index];
+      if(!stage||!list||!item)return 0;
+      const viewport=stage.clientHeight,track=list.scrollHeight;
+      const desired=viewport/2-(item.offsetTop+item.offsetHeight/2);
+      return Math.min(0,Math.max(viewport-track,desired));
+    };
     const update=progress=>{
       const position=Math.min(.9999,Math.max(0,progress))*5,index=Math.min(4,Math.floor(position)),local=position-index;
       items.forEach((item,itemIndex)=>item.classList.toggle("is-active",itemIndex===index));
       marks.forEach((mark,markIndex)=>mark.classList.toggle("is-active",markIndex===index));
       rail.style.height=`${((index+local)/5)*100}%`;
+      gsap.set(list,{y:fitActiveItem(index)});
     };
+    const focusHandlers=items.map((item,index)=>{const handler=()=>update((index+.1)/items.length);item.addEventListener("focus",handler);return handler;});
     update(0);
     const trigger=ScrollTrigger.create({id:"mass-ai-products",trigger:scrollArea,start:"top 82px",end:"bottom 18%",scrub:.45,invalidateOnRefresh:true,onUpdate:self=>update(self.progress)});
-    return()=>trigger.kill();
+    return()=>{trigger.kill();items.forEach((item,index)=>item.removeEventListener("focus",focusHandlers[index]));scrollArea.classList.remove("is-enhanced");gsap.set(list,{clearProps:"transform"});rail.style.height="";items.forEach((item,index)=>item.classList.toggle("is-active",index===0));marks.forEach((mark,index)=>mark.classList.toggle("is-active",index===0));};
   });
   document.fonts?.ready.then(()=>ScrollTrigger.refresh());
 })();
@@ -217,16 +177,24 @@
   const wireTabs=(listSelector,panelSelector,data,render)=>{
     const buttons=[...document.querySelectorAll(listSelector)],panel=document.querySelector(panelSelector);
     if(!buttons.length||!panel)return;
+    const group=listSelector.includes("audience")?"audience":"problem";
+    buttons.forEach((button,index)=>{
+      const key=button.dataset.audience||button.dataset.problem||String(index+1);
+      button.id=`${group}-tab-${key}`;
+      button.setAttribute("aria-controls",panel.id);
+      button.tabIndex=index===0?0:-1;
+    });
     const select=button=>{
       if(button.classList.contains("is-active"))return;
       buttons.forEach(item=>{const active=item===button;item.classList.toggle("is-active",active);item.setAttribute("aria-selected",String(active));item.tabIndex=active?0:-1});
+      panel.setAttribute("aria-labelledby",button.id);
       transition(panel,()=>render(panel,data[button.dataset.audience||button.dataset.problem]));
     };
     buttons.forEach((button,index)=>{
-      button.tabIndex=index===0?0:-1;
       button.addEventListener("click",()=>select(button));
       button.addEventListener("keydown",event=>{if(!["ArrowDown","ArrowRight","ArrowUp","ArrowLeft","Home","End"].includes(event.key))return;event.preventDefault();let next=index;if(event.key==="Home")next=0;else if(event.key==="End")next=buttons.length-1;else next=(index+(["ArrowDown","ArrowRight"].includes(event.key)?1:-1)+buttons.length)%buttons.length;buttons[next].focus();select(buttons[next])});
     });
+    panel.setAttribute("aria-labelledby",buttons.find(button=>button.classList.contains("is-active"))?.id||buttons[0].id);
   };
   wireTabs(".audience-option","#audience-panel",audienceData,(panel,item)=>{
     panel.querySelector(".audience-panel-index").textContent=item.index;panel.querySelector("h3").textContent=item.title;panel.querySelector(".audience-summary").textContent=item.summary;
@@ -254,6 +222,7 @@
   ];
   const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
   const prevPeek=section.querySelector(".why-mass-peek-prev"),nextPeek=section.querySelector(".why-mass-peek-next");
+  steps.forEach(step=>{step.id=`why-mass-tab-${step.dataset.principle}`;step.setAttribute("aria-controls",panel.id)});
   let active=0,startX=0,dragging=false;
   const setPeek=(element,item)=>{element.querySelector("span").textContent=item.index;element.querySelector("strong").textContent=item.title};
   const render=index=>{
@@ -263,12 +232,20 @@
     evidence.querySelector(".why-mass-decision").textContent=item.decision;evidence.querySelector(".why-mass-method").textContent=item.method;evidence.querySelector(".why-mass-experience").textContent=item.experience;
     setPeek(prevPeek,previous);setPeek(nextPeek,next);
     steps.forEach((step,stepIndex)=>{const selected=stepIndex===active;step.classList.toggle("is-active",selected);step.setAttribute("aria-selected",String(selected));step.tabIndex=selected?0:-1});
+    panel.setAttribute("aria-labelledby",steps[active].id);
   };
   const select=(index,direction=index>active?1:-1)=>{
     if(index===active)return;
-    const targets=[panel,evidence,prevPeek,nextPeek];targets.forEach(target=>target.classList.add("is-changing"));
-    if(typeof gsap==="undefined"||reduced){render(index);targets.forEach(target=>target.classList.remove("is-changing"));return}
-    gsap.to(targets,{autoAlpha:0,x:-direction*20,duration:.17,ease:"power2.in",overwrite:true,onComplete:()=>{render(index);gsap.fromTo(targets,{autoAlpha:0,x:direction*20},{autoAlpha:1,x:0,duration:.38,stagger:.035,ease:"power3.out",clearProps:"transform,opacity,visibility",onComplete:()=>targets.forEach(target=>target.classList.remove("is-changing"))})}})
+    const targets=[panel,evidence,prevPeek,nextPeek];
+    // Commit the selected content immediately; animation must not gate navigation.
+    render(index);
+    if(typeof gsap==="undefined"||reduced||document.hidden){
+      if(typeof gsap!=="undefined"){gsap.killTweensOf(targets);gsap.set(targets,{clearProps:"transform,opacity,visibility"})}
+      targets.forEach(target=>target.classList.remove("is-changing"));return
+    }
+    gsap.killTweensOf(targets);
+    targets.forEach(target=>target.classList.add("is-changing"));
+    gsap.fromTo(targets,{autoAlpha:0,x:direction*20},{autoAlpha:1,x:0,duration:.38,stagger:.035,ease:"power3.out",overwrite:true,clearProps:"transform,opacity,visibility",onComplete:()=>targets.forEach(target=>target.classList.remove("is-changing"))})
   };
   steps.forEach((step,index)=>{step.addEventListener("click",()=>select(index));step.addEventListener("keydown",event=>{if(!["ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;event.preventDefault();const target=event.key==="Home"?0:event.key==="End"?steps.length-1:(index+(event.key==="ArrowRight"?1:-1)+steps.length)%steps.length;steps[target].focus();select(target,event.key==="ArrowLeft"?-1:1)})});
   section.querySelector(".why-mass-prev").addEventListener("click",()=>select((active-1+principles.length)%principles.length,-1));section.querySelector(".why-mass-next").addEventListener("click",()=>select((active+1)%principles.length,1));
@@ -302,24 +279,32 @@
   }));
 })();
 
-const form=document.querySelector("#contact-form");
-form?.addEventListener("submit",e=>{e.preventDefault();let ok=true;const fields=[...form.querySelectorAll("[required]")];fields.forEach(f=>{const err=f.parentElement.querySelector(".error");let msg="";if(!f.value.trim())msg="This field is required.";else if(f.type==="email"&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value))msg="Enter a valid email address.";f.setAttribute("aria-invalid",msg?"true":"false");if(err)err.textContent=msg;ok=!msg&&ok});if(ok){const name=form.name.value.trim(),email=form.email.value.trim(),company=form.company.value.trim(),message=form.message.value.trim(),budget=form.budget.value.trim();const body=["Name: "+name,"Email: "+email,company?"Company: "+company:null,budget?"Budget range: "+budget:null,"",message].filter(line=>line!==null).join("\n");const mailto="mailto:contact@mass.llc?subject="+encodeURIComponent("Project brief from "+name)+"&body="+encodeURIComponent(body);form.reset();form.hidden=true;const success=document.querySelector(".success");success.classList.add("show");success.focus();window.location.href=mailto}});
+/* GA4 conversion and contact-intent tracking (no personal data). */
+const trackMassEvent=(name,params={})=>{
+  if(typeof window.gtag==="function")window.gtag("event",name,params);
+};
+document.addEventListener("click",event=>{
+  const link=event.target.closest("a");
+  if(!link)return;
+  const href=link.getAttribute("href")||"";
+  if(href.startsWith("mailto:")){
+    trackMassEvent("email_click",{link_location:location.pathname});
+    return;
+  }
+  if(href.startsWith("tel:")){
+    trackMassEvent("phone_click",{link_location:location.pathname});
+    return;
+  }
+  try{
+    const url=new URL(link.href,location.href);
+    if(url.origin===location.origin&&url.pathname.replace(/\/$/,"")==="/contact"){
+      trackMassEvent("contact_cta_click",{link_location:location.pathname});
+    }
+  }catch{}
+});
+
+const form=document.querySelector("#contact-form");form?.addEventListener("submit",event=>{event.preventDefault();let valid=true;const fields=[...form.querySelectorAll("[required]")];fields.forEach(field=>{const error=field.parentElement.querySelector(".error");let errorMessage="";if(!field.value.trim())errorMessage="This field is required.";else if(field.type==="email"&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value))errorMessage="Enter a valid email address.";field.setAttribute("aria-invalid",errorMessage?"true":"false");if(error)error.textContent=errorMessage;valid=!errorMessage&&valid});if(!valid)return;const name=form.name.value.trim(),email=form.email.value.trim(),company=form.company.value.trim(),details=form.message.value.trim(),budget=form.budget.value.trim(),body=["Name: "+name,"Email: "+email,company?"Company: "+company:null,budget?"Budget range: "+budget:null,"",details].filter(line=>line!==null).join("\n"),mailto="mailto:info@mass.llc?subject="+encodeURIComponent("Project brief from "+name)+"&body="+encodeURIComponent(body),success=document.querySelector(".success"),fallback=document.querySelector("#contact-email-fallback");if(success){success.classList.add("show");success.focus();const status=success.querySelector("p");if(status)status.textContent="Your email app will open with this brief ready for review. Send the email to share it with MASS."}if(fallback){const output=fallback.querySelector("textarea"),emailLink=fallback.querySelector("a"),copyButton=fallback.querySelector("button");if(output)output.value=body;if(emailLink)emailLink.href=mailto;if(copyButton)copyButton.onclick=async()=>{try{await navigator.clipboard.writeText(body);copyButton.textContent="Copied"}catch{if(output){output.focus();output.select()}}};fallback.hidden=false}trackMassEvent("contact_email_prepared",{method:"email_brief"});window.location.href=mailto});
 if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&navigator.hardwareConcurrency>4){document.addEventListener("pointermove",e=>{document.documentElement.style.setProperty("--mx",e.clientX+"px");document.documentElement.style.setProperty("--my",e.clientY+"px")},{passive:true})}
-(()=>{
-  const fine=matchMedia("(hover: hover) and (pointer: fine)").matches,reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(!fine||reduced)return;
-  const dot=document.createElement("span"),ring=document.createElement("span");dot.className="mass-cursor-dot";ring.className="mass-cursor-ring";dot.setAttribute("aria-hidden","true");ring.setAttribute("aria-hidden","true");document.body.append(dot,ring);document.documentElement.classList.add("has-mass-cursor");
-  let x=-100,y=-100,rx=-100,ry=-100,visible=false,raf=0;
-  const aboutPage=!!document.querySelector(".about-story");
-  if(aboutPage)document.documentElement.classList.add("about-neon-cursor");
-  const darkSelector=".hero,.dark,.web-work,.site-header.dark,.ai-editorial,.article-hero,.product-hero,.article-callout,.footer,.site-footer,.about-static-hero,.principles,.page-hero,.contact-form-section,.testimonial-scroll-section,.ai-examples,.ai-worked,.capabilities,.ai-simpler-grid article:first-child,.product-roadmap,.product-sample";
-  const lightSelector=".product-ecosystem,.ai-explain,.ai-compare,.ai-scope,.ai-guard,.faq-section,.accent-panel,.ai-worked article:last-child,.ai-simpler-grid article:last-child,.product-facts,.product-story,.product-detail";
-  const interactiveSelector="a,button,[role='button'],summary,.post,.product-card,.web-work-card,input,textarea,select";
-  const setTone=target=>{const light=!aboutPage&&(!!target?.closest(lightSelector)||!target?.closest(darkSelector));dot.classList.toggle("is-light",light);ring.classList.toggle("is-light",light)};
-  const animate=()=>{rx+=(x-rx)*.16;ry+=(y-ry)*.16;dot.style.transform=`translate3d(${x}px,${y}px,0)`;ring.style.transform=`translate3d(${rx}px,${ry}px,0)`;raf=requestAnimationFrame(animate)};
-  document.addEventListener("pointermove",e=>{x=e.clientX;y=e.clientY;if(!visible){visible=true;dot.classList.add("is-visible");ring.classList.add("is-visible");rx=x;ry=y}const target=document.elementFromPoint(x,y);setTone(target);const textField=target?.closest("input,textarea,select,[contenteditable='true']");dot.style.opacity=textField?"0":"";ring.style.opacity=textField?"0":"";ring.classList.toggle("is-active",!!target?.closest(interactiveSelector)&&!textField)},{passive:true});
-  document.addEventListener("pointerdown",()=>ring.classList.add("is-pressed"),{passive:true});document.addEventListener("pointerup",()=>ring.classList.remove("is-pressed"),{passive:true});document.documentElement.addEventListener("mouseleave",()=>{visible=false;dot.classList.remove("is-visible");ring.classList.remove("is-visible")});window.addEventListener("blur",()=>{dot.classList.remove("is-visible");ring.classList.remove("is-visible")});raf=requestAnimationFrame(animate);
-})();
 const heroLiquidGrid=document.querySelector(".hero-liquid-grid");
 if(heroLiquidGrid){
   const ctx=heroLiquidGrid.getContext("2d"),hero=heroLiquidGrid.closest(".hero"),reduced=matchMedia("(prefers-reduced-motion: reduce)").matches,lowEnd=(navigator.hardwareConcurrency||8)<=4;
@@ -428,6 +413,7 @@ if(heroParticleCanvas){
 (()=>{
   const container=document.getElementById("footer-wave");
   if(!container||container.dataset.ready)return;
+  if(window.MASSFooterWave){window.MASSFooterWave.init();return}
   container.dataset.ready="true";
   const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lowEnd=(navigator.hardwareConcurrency||8)<=4;
