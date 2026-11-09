@@ -17,19 +17,31 @@
     if(container.querySelector("canvas[data-footer-fallback]"))return;
     const canvas=document.createElement("canvas"),context=canvas.getContext("2d"),ratio=Math.min(devicePixelRatio||1,2);
     canvas.dataset.footerFallback="true";canvas.setAttribute("aria-hidden","true");
-    const render=()=>{
-      const width=container.clientWidth,height=container.clientHeight;
+    let width=0,height=0,phase=0,frame=0,visible=true;
+    const draw=()=>{
       if(!width||!height)return;
-      canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;
       context.setTransform(ratio,0,0,ratio,0,0);context.clearRect(0,0,width,height);context.fillStyle="rgba(217,217,217,.7)";
       const rows=17;
       for(let row=0;row<rows;row++){
         const progress=row/(rows-1),depth=.18+progress*.82,spacing=12+depth*18,radius=.55+depth*.85,y=height*(.08+progress*.88),amplitude=4+depth*17,offset=Math.sin(row*.74)*spacing*.45;
-        for(let x=-spacing*2;x<width+spacing*2;x+=spacing){const wave=Math.sin(x*.018+row*.42)*amplitude+Math.sin(row*.55)*amplitude*.3;context.beginPath();context.arc(x+offset,y+wave,radius,0,Math.PI*2);context.fill()}
+        for(let x=-spacing*2;x<width+spacing*2;x+=spacing){const wave=Math.sin(x*.018+row*.42+phase)*amplitude+Math.sin(row*.55+phase*.6)*amplitude*.3;context.beginPath();context.arc(x+offset,y+wave,radius,0,Math.PI*2);context.fill()}
       }
     };
+    const render=()=>{
+      width=container.clientWidth;height=container.clientHeight;
+      if(!width||!height)return;
+      canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;
+      draw();
+    };
+    /* The fallback moves too, so the footer never looks frozen when WebGL is unavailable. */
+    const animate=()=>{frame=0;if(!canvas.isConnected||!visible||document.hidden)return;phase+=.035;draw();frame=requestAnimationFrame(animate)};
+    const start=()=>{if(!frame&&visible&&!document.hidden&&canvas.isConnected)frame=requestAnimationFrame(animate)};
     container.append(canvas);container.dataset.footerFallback="true";render();
     if("ResizeObserver" in window)new ResizeObserver(render).observe(container);else addEventListener("resize",render,{passive:true});
+    if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
+      if("IntersectionObserver" in window)new IntersectionObserver(entries=>{visible=entries.some(entry=>entry.isIntersecting);visible?start():(cancelAnimationFrame(frame),frame=0)}).observe(container);
+      document.addEventListener("visibilitychange",start);start();
+    }
   };
   const createSurface=container=>{
     if(container.dataset.webglReady||!window.THREE)return;
