@@ -27,12 +27,13 @@ Root marketing routes use extensionless canonical URLs; an accidental trailing s
 
 - `/mims` — MIMS teaching-system landing page. It replaces the public AIMEE listing. The product remains clearly marked as in development and the initial CBSE scope is stated on the page.
 - `/campus` — Campus AI sessions landing page.
+- `/fbeds` — FBEDS client case study (agentic AI email operations for a UAE and Oman hotel-distribution team). Linked from About, Agentic AI, AI Automation and UAE; listed in `sitemap.xml` and `llms.txt`.
 
 ## Post-upload verification
 
 Use an incognito browser or `curl -I` against the deployed domain to confirm:
 
-- `/`, `/mims` and `/campus` return `200`.
+- `/`, `/mims`, `/campus` and `/fbeds` return `200`; `/fbeds/` and `/fbeds.html` resolve to `/fbeds`.
 - `/aimee`, `/aimee/`, `/aimee.html` and `/AIMEE.HTML` each return a single `301` to `/mims`.
 - `/mims/` and `/campus/` return a single `301` to their extensionless URLs.
 - `/assets/mims/documents/reader.html?file=class10-trigonometry-test.pdf` returns `200`, loads all four pages and has the expected noindex header.
