@@ -7130,6 +7130,8 @@ canvas {
     padding-top: 70px;
     padding-bottom: 70px;
     align-items: flex-start;
+    /* Top-align: centred content re-centres (and shifts) when web fonts swap in. */
+    justify-content: flex-start;
     text-align: left
   }
 
