@@ -316,7 +316,7 @@ if(heroLiquidGrid){
   resizeGrid();drawGrid(0);addEventListener("resize",()=>{resizeGrid();if(reduced||lowEnd)drawGrid(0)},{passive:true});
 }
 
-/* Blog — interactive luminous globe mesh. Starts after load + idle so WebGL setup does not block first paint/input. */
+/* Blog — interactive luminous globe mesh. Built on first interaction (see below). */
 const startBlogGlobe=()=>{
   const mount=document.querySelector(".blog-globe");
   if(!mount||typeof THREE==="undefined")return;
@@ -334,9 +334,14 @@ const startBlogGlobe=()=>{
   const render=()=>{grip+=(targetGrip-grip)*.08;if(!reduced){globe.rotation.y+=.00135+velocityY+(aimX-globe.rotation.y*.035)*.015;globe.rotation.x+=(aimY-globe.rotation.x)*.035+velocityX;velocityX*=.9;velocityY*=.9;pointMat.size=.0125+grip*.003;pointMat.opacity=.7+grip*.12;cageMaterial.opacity=.27+grip*.12;frame=requestAnimationFrame(render)}renderer.render(scene,camera)};
   const observer=new ResizeObserver(resize);observer.observe(mount);resize();render();
 };
+/* Load three.js (~600 KB) and build the globe only on the visitor's first scroll/touch/mouse/key,
+   so neither parsing nor WebGL setup runs during page load. Shares the footer loader's promise to avoid a double fetch. */
 if(document.querySelector(".blog-globe")){
-  const idleGlobe=()=>"requestIdleCallback" in window?requestIdleCallback(startBlogGlobe,{timeout:2500}):setTimeout(startBlogGlobe,300);
-  document.readyState==="complete"?idleGlobe():addEventListener("load",idleGlobe,{once:true});
+  const threeSrc="/assets/vendor/three.min.js",wake=["pointerdown","pointermove","touchstart","wheel","scroll","keydown"];
+  const loadThree=()=>window.THREE?Promise.resolve(window.THREE):(window.__massFooterThreePromise||(window.__massFooterThreePromise=new Promise((resolve,reject)=>{const s=document.createElement("script");s.src=threeSrc;s.async=true;s.onload=()=>window.THREE?resolve(window.THREE):reject(new Error("Three.js did not initialise"));s.onerror=()=>reject(new Error("Three.js failed to load"));document.head.append(s)})));
+  let started=false;
+  const wakeGlobe=()=>{if(started)return;started=true;wake.forEach(t=>removeEventListener(t,wakeGlobe));loadThree().then(startBlogGlobe).catch(()=>{})};
+  wake.forEach(t=>addEventListener(t,wakeGlobe,{passive:true,once:true}));
 }
 
 const heroParticleCanvas=document.querySelector(".hero-art .particle-mark");
