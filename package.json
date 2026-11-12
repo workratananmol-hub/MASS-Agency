@@ -8,10 +8,13 @@
     "start": "http-server . -p 3000 -c-1",
     "preview": "http-server . -p 4173 -c-1",
     "seo:audit": "node scripts/seo-audit.mjs",
-    "package:release": "node scripts/package-release.mjs"
+    "package:release": "node scripts/package-release.mjs",
+    "md:build": "node scripts/build-markdown.mjs",
+    "md:check": "node scripts/build-markdown.mjs --check"
   },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "turndown": "^7.2.0"
   },
   "engines": {
     "node": ">=18"

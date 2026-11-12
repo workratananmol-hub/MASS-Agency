@@ -2,6 +2,7 @@
 
 > Canonical site: https://mass.llc/
 > Contact: [info@mass.llc](mailto:info@mass.llc) | United States: +1 540 488 7038 | India: +91 7483509091
+> Markdown: each page below is also available as Markdown. Append `.md` to its path (for example `/pricing.md`; the homepage is `/index.md`) or request the page with `Accept: text/markdown`.
 
 [MASS](https://mass.llc/) is a Herndon, Virginia-based studio that builds AI automation, websites, custom software, AI agents, and education-focused product experiences. This is a concise, human-readable directory of the public canonical pages on mass.llc. It supplements ordinary web crawling and does not control robots access, indexing, training, ranking, or citations. For current details, use the linked canonical page and visible site content.
 

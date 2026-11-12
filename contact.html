@@ -124,19 +124,19 @@
                 <p>MASS is based in Herndon, Virginia, and works with clients beyond the local area.</p>
             </aside>
             <div class="contact-form-wrapper" style="margin-top: 7rem;">
-                <form id="contact-form" novalidate>
-                    <div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name"
+                <form id="contact-form" novalidate toolname="contact_mass" tooldescription="Prepare a project brief for MASS LLC (web development, custom software, AI automation or AI agents). Submitting opens the visitor&#39;s email app with the brief addressed to info@mass.llc; nothing is sent until the visitor sends that email.">
+                    <div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" toolparamdescription="Full name of the person asking."
                             required><span class="error" role="status"></span></div>
-                    <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email"
+                    <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" toolparamdescription="Work email address MASS should reply to."
                             autocomplete="email" required><span class="error" role="status"></span></div>
-                    <div class="field"><label for="company">Company</label><input id="company" name="company"
+                    <div class="field"><label for="company">Company</label><input id="company" name="company" toolparamdescription="Company or organisation name (optional)."
                             autocomplete="organization"><span class="error" role="status"></span></div>
                     <div class="field"><label for="message">The problem and the outcome you need</label><textarea
-                            id="message" name="message" required
+                            id="message" name="message" required toolparamdescription="The problem, the outcome needed, systems involved and any timing."
                             placeholder="What is broken or missing, what success looks like, which systems are involved, and any timing you already know."></textarea><span
                             class="error" role="status"></span></div>
                     <div class="field"><label for="budget">Budget range (optional)</label><select id="budget"
-                            name="budget">
+                            name="budget" toolparamdescription="Optional budget range in US dollars.">
                             <option value="">Select a range</option>
                             <option>Under $15,000</option>
                             <option>$15,000–$50,000</option>
@@ -264,6 +264,6 @@
             </div>
         </div>
     </footer>
-</body>
+<script src="/js/webmcp.js?v=20261112-agent1" defer></script></body>
 
 </html>

@@ -16,7 +16,7 @@ const date = new Date().toISOString().slice(0, 10);
 const archive = path.join(output, `MASS-seo-deploy-ready-${date}-${shortRelease}.zip`);
 const manifestPath = archive.replace(/\.zip$/i, ".package-verification.json");
 const includedRootFiles = new Set([".htaccess", "404.html", "500.html", "favicon.svg", "llms.txt", "manifest.webmanifest", "robots.txt", "sitemap.xml"]);
-const includedDirectories = new Set([".well-known", "assets", "css", "js"]);
+const includedDirectories = new Set([".well-known", "assets", "css", "js", "md"]);
 const required = [".htaccess", "index.html", "robots.txt", "sitemap.xml", "manifest.webmanifest", "favicon.svg", "llms.txt"];
 const isAllowed = file => {
   const segments = file.split("/");
