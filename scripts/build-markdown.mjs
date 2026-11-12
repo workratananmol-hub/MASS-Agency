@@ -85,7 +85,8 @@ for (const file of pages) {
   expected.add(name);
   const md = toMarkdown(file, fs.readFileSync(path.join(root, file), "utf8"));
   const target = path.join(outDir, name);
-  const current = fs.existsSync(target) ? fs.readFileSync(target, "utf8") : null;
+  // Git may check files out with CRLF on Windows; compare content, not line endings.
+  const current = fs.existsSync(target) ? fs.readFileSync(target, "utf8").replace(/\r\n/g, "\n") : null;
   if (current === md) continue;
   if (check) stale.push(name);
   else fs.writeFileSync(target, md);
