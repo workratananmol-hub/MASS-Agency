@@ -95,15 +95,18 @@ RewriteRule ^(.+?)/?$ $1.html [L]
   </FilesMatch>
   <FilesMatch "\.md$">
     Header always set X-Robots-Tag "noindex"
+    # LiteSpeed ignores AddCharset here; the pages contain non-ASCII text.
+    Header always set Content-Type "text/markdown; charset=utf-8"
   </FilesMatch>
 
   # Advertise agent-readable resources (RFC 8288). Every page points at the
   # site directory; the homepage also names its Markdown alternate.
+  # Single-quoted values: LiteSpeed sends \" escapes literally.
   <FilesMatch "\.html$">
-    Header always set Link "</llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+    Header always set Link '</llms.txt>; rel="describedby"; type="text/plain"'
   </FilesMatch>
   <Files "index.html">
-    Header always append Link "</index.md>; rel=\"alternate\"; type=\"text/markdown\""
+    Header always append Link '</index.md>; rel="alternate"; type="text/markdown"'
   </Files>
 </IfModule>
 
