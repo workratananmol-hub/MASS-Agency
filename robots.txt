@@ -10,10 +10,13 @@ Allow: /
 User-agent: Claude-User
 Allow: /
 
-# Model-training crawlers are intentionally governed by the same public
-# discovery policy below. This file does not claim that any crawler will index,
-# train on, cite, or surface the site; each crawler applies its own policies.
+# Crawl access below is open to every user-agent. The Content-Signal line
+# (https://contentsignals.org/) states how MASS permits use after access:
+# search=yes allows search indexing and links; ai-input=yes allows real-time
+# AI answers that cite pages; ai-train=no declines use for training or
+# fine-tuning AI models. Each crawler applies its own policies.
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
 
 Sitemap: https://mass.llc/sitemap.xml
